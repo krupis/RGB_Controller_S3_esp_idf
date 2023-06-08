@@ -14,13 +14,11 @@ esp_timer_handle_t fading_lights_timer = NULL; // this is main controller task t
 esp_timer_handle_t running_lights_timer = NULL; // this is main controller task timer 
 
 #define LED_STRIP_BLINK_GPIO  14
-#define LED_STRIP_LED_NUMBERS 50
+#define LED_STRIP_LED_NUMBERS 110
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
 
 
 
-// // esp_timer_handle_t fading_lights_timer = NULL; // this is main controller task timer 
-// // esp_timer_handle_t running_lights_timer = NULL; // this is main controller task timer 
 
 
 void RGB_setup(){
@@ -288,5 +286,108 @@ void RGB_running_lights(struct rgb_params_s* rgb_parameters){
         ESP_ERROR_CHECK(esp_timer_start_periodic(running_lights_timer, ((rgb_parameters->ramp_up_time/LED_STRIP_LED_NUMBERS)*1000))); //
     }
 }
+
+
+
+void RGB_running_rainbow(void *argument)
+{   
+    uint8_t mode = 1; 
+    uint8_t rainbow_segments = 7; //red,ornage,yellow,green,blue,indigo,violet
+    uint8_t red_in;
+    uint8_t orange_in;
+    uint8_t yellow_in;
+    uint8_t green_in;
+    uint8_t blue_in;
+    uint8_t indigo_in;
+    uint8_t violet_in;
+    uint8_t index_test = 0;
+    uint8_t led_index;
+    
+    // 0 means back and forth
+    // 1 means go forward and start over without going backwards
+    bool direction = 0;
+    uint16_t led_index_red = 0;
+    uint16_t led_index_orange = 1;
+    uint16_t led_index_yellow = 2;
+    uint16_t led_index_green = 3;
+    uint16_t led_index_blue = 4;
+    uint16_t led_index_indigo = 5;
+    uint16_t led_index_violet = 6;
+
+    uint16_t led_index_red_ro;
+    uint16_t led_index_orange_ro;
+    uint16_t led_index_yellow_ro;
+    uint16_t led_index_green_ro;
+    uint16_t led_index_blue_ro;
+    uint16_t led_index_indigo_ro;
+    uint16_t led_index_violet_ro;
+
+
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+  	for (;;)
+	{	
+        //MODE 0
+        if (mode == 0){
+            if(direction == 0){
+                led_index++;
+                if(led_index >= LED_STRIP_LED_NUMBERS){
+                    direction = 1;
+                }
+                else{
+                    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index, 100, 0, 0));
+                }
+            }
+            
+            else if(direction == 1){
+                led_index--;
+                if(led_index <= 0){
+                    direction = 0;
+                }
+                else{
+                ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index, 0, 0, 0));
+                }
+            }
+            ESP_ERROR_CHECK(led_strip_refresh(led_strip));   
+        }
+
+
+        //MODE 1
+        else if (mode == 1){
+
+            ESP_ERROR_CHECK(led_strip_clear(led_strip));
+
+            led_index_red_ro = (led_index_red % LED_STRIP_LED_NUMBERS);
+            led_index_orange_ro = (led_index_orange % LED_STRIP_LED_NUMBERS);
+            led_index_yellow_ro = (led_index_yellow % LED_STRIP_LED_NUMBERS);
+            led_index_green_ro = (led_index_green % LED_STRIP_LED_NUMBERS);
+            led_index_blue_ro = (led_index_blue % LED_STRIP_LED_NUMBERS);
+            led_index_indigo_ro = (led_index_indigo % LED_STRIP_LED_NUMBERS);
+            led_index_violet_ro = (led_index_violet % LED_STRIP_LED_NUMBERS);
+
+
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_red_ro, 255, 0, 0));//red
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_orange_ro, 255, 127, 0)); //orange
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_yellow_ro, 255, 255, 20)); //yellow
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_green_ro, 0, 255, 0)); //green
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_blue_ro, 0, 0, 255)); //blue
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_indigo_ro, 75, 0, 130)); //indigo
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_violet_ro, 148, 0, 211)); //violet
+            led_index_red++;
+            led_index_orange++;
+            led_index_yellow++;
+            led_index_green++;
+            led_index_blue++;
+            led_index_indigo++;
+            led_index_violet++;
+            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+        }
+		vTaskDelay(50/portTICK_PERIOD_MS);
+        
+    }
+
+}
+
 
 

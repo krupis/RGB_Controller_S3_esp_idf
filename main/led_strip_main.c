@@ -50,12 +50,12 @@ void app_main(void)
 
     RGB_setup();
 
-    rgb_params.ramp_up_time = 500; 
-    strip_color.red = 100;
-    strip_color.blue = 100;
-    strip_color.green = 0;
-    rgb_params.color_ramping = 1;
-    RGB_running_lights(&rgb_params);
+    // rgb_params.ramp_up_time = 3000; 
+    // strip_color.red = 100;
+    // strip_color.blue = 100;
+    // strip_color.green = 0;
+    // rgb_params.color_ramping = 1;
+    // RGB_running_lights(&rgb_params);
 
 
     // rgb_params.ramp_up_time = 1000; 
@@ -65,6 +65,7 @@ void app_main(void)
     // RGB_fade_in_out(&rgb_params);
 
 
+    xTaskCreate(RGB_running_rainbow,"RGB_running_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
     xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart
 
     //RGB_set_red(255);

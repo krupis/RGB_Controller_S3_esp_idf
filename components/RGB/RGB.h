@@ -25,6 +25,7 @@ void RGB_set_rgb(uint8_t red,uint8_t green,uint8_t blue);
 
 void RGB_fade_in_out_callback(void* arg);
 void RGB_running_lights_callback(void* arg);
+void RGB_running_rainbow(void *argument);
 
 
 
