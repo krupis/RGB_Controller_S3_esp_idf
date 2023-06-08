@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+	
+<head>
+
+	<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+
+	<p>
+		An example demonstrating the use of the
+		<code>&lt;input type="color"&gt;</code> control.
+	</p>
+
+	<label for="colorWell">Color:</label>
+	<input type="color" value="#ff0000" id="colorWell" />
+
+	<p>
+		Watch the paragraph colors change when you adjust the color picker. As you
+		make changes in the color picker, the first paragraph's color changes, as a
+		preview (this uses the <code>input</code> event). When you close the color
+		picker, the <code>change</code> event fires, and we detect that to change
+		every paragraph to the selected color.
+	</p>
+
+
+
+
+
+
+
+
+
+
+	<table class="styled-table">
+
+		<tr>
+			<form action="/animation" method="POST" name="myForm">
+				<p><label for="first_name">First Name:</label>
+					<input type="text" name="first_name" id="fname">
+				</p>
+
+				<p><label for="last_name">Last Name:</label>
+					<input type="text" name="last_name" id="lname">
+				</p>
+
+				<input value="Submit" type="submit" onclick="submitform()">
+			</form>
+		</tr>
+
+
+
+
+		<tr>
+			<td>
+				<label for="running_lights">Running lights</label>
+			</td>
+			<td>
+				<button id="running_lights" type="button" style="width:100%" onclick="running_lights()">Running lights
+				</button>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="fading_lights">Fade in/out</label>
+			</td>
+			<td>
+				<button id="fade_lights" type="button" style="width:100%" onclick="fading_lights()">Fading lights
+				</button>
+			</td>
+		</tr>
+
+
+
+		<tr>
+			<td>
+				<label for="test1">Brightness</label>
+			</td>
+			<td>
+				<div id="slider">
+					<input class="bar" type="range" id="rangeinput" min="0" max="255" value="0"
+						oninput="test_slider()" />
+					<span class="highlight"></span>
+					<output id="rangevalue">1</output>
+				</div>
+			</td>
+		</tr>
+
+
+		<tr>
+			<td>
+				<label for="test2">Red</label>
+			</td>
+			<td>
+				<div id="slider">
+					<input class="bar" type="range" id="rangeinput_red" min="0" max="255" value="0"
+						oninput="test_slider_red()" />
+					<span class="highlight"></span>
+					<output id="rangevalue_red">1</output>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="test3">Green</label>
+			</td>
+			<td>
+				<div id="slider">
+					<input class="bar" type="range" id="rangeinput_green" min="0" max="255" value="0"
+						oninput="test_slider_green()" />
+					<span class="highlight"></span>
+					<output id="rangevalue_green">1</output>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="test4">Blue</label>
+			</td>
+			<td>
+				<div id="slider">
+					<input class="bar" type="range" id="rangeinput_blue" min="0" max="255" value="0"
+						oninput="test_slider_blue()" />
+					<span class="highlight"></span>
+					<output id="rangevalue_blue">1</output>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:25%">
+				<label for="filepath">Select a file</label>
+			</td>
+			<td>
+				<input id="newfile" type="file" onchange="setpath()" style="width:100%;">
+			</td>
+
+			<td>
+				<label for="newfile" class="button custom-file-upload1">Select</label>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="filepath">Set path on server</label>
+			</td>
+			<td>
+				<input id="filepath" style="width:96%" type="text" readonly>
+			</td>
+			<td>
+				<div class="popup" style="width:100%">
+					<button class="button button2" id="upload_flash" type="button" style="width:100%"
+						onclick="upload_flash()">Upload/Flash<span class="popuptext" id="myPopup1">Only .bin files are
+							allowed</span></button>
+				</div>
+			</td>
+
+		</tr>
+
+		<tr>
+			<td>
+				<label for="rollback">Return to v.1.0.0</label>
+			</td>
+			<td>
+			</td>
+			<td>
+				<div class="popup" style="width:100%">
+					<button class="button button3" id="downgrade" type="button" style="width:100%"
+						onclick="downgrade()">Rollback <span class="popuptext" id="myPopup2">Already a v.1.0.0</span>
+					</button>
+				</div>
+			</td>
+
+
+
+
+		</tr>
+		</td>
+		</tr>
+	</table>
+</body>
+
+</html>
+<script>
+
+
+
+
+	function submitform() {
+		console.log("sending json");
+		var xhr = new XMLHttpRequest();
+		//xhttp.open("POST", "/brightness", true);
+		xhr.open("POST", "/animation", true);
+		xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+		var j = {
+			"red": "200",
+			"green": "100",
+			"blue": "50",
+		};
+		xhr.send(JSON.stringify(j));
+	}
+
+
+
+	function startup() {
+		console.log("startup");
+		colorWell = document.querySelector("#colorWell");
+		colorWell.value = defaultColor;
+		colorWell.addEventListener("input", updateFirst, false);
+		colorWell.addEventListener("change", updateAll, false);
+		colorWell.select();
+	}
+
+
+	let colorWell;
+	const defaultColor = "#0000ff";
+
+	window.addEventListener("load", startup, false);
+
+
+
+
+	function fading_lights() {
+
+		console.log("fading lights button clicked");
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/animation", true);
+		xhttp.send("name=fading");
+
+	}
+
+
+	function running_lights() {
+		console.log("running lights button clicked");
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/animation", true);
+		xhttp.send("name=running");
+
+	}
+
+
+	function updateFirst(event) {
+		console.log("update first");
+		const p = document.querySelector("p");
+		if (p) {
+			console.log(colorWell.value);
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST", "/brightness", true);
+			xhttp.send("rgb=" + colorWell.value);
+
+		}
+	}
+
+
+	function test_slider() {
+		var slider_value = document.getElementById("rangeinput").value;
+		console.log("slider value = ", slider_value);
+		rangevalue.value = slider_value;
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/brightness", true);
+		xhttp.send("name=" + slider_value);
+
+	}
+
+	function test_slider_red() {
+		var slider_value = document.getElementById("rangeinput_red").value;
+		console.log("slider value = ", slider_value);
+		rangevalue_red.value = slider_value;
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/brightness", true);
+		xhttp.send("red=" + slider_value);
+
+	}
+
+	function test_slider_green() {
+		var slider_value = document.getElementById("rangeinput_green").value;
+		console.log("slider value = ", slider_value);
+		rangevalue_green.value = slider_value;
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/brightness", true);
+		xhttp.send("green=" + slider_value);
+
+	}
+
+	function test_slider_blue() {
+		var slider_value = document.getElementById("rangeinput_blue").value;
+		console.log("slider value = ", slider_value);
+		rangevalue_blue.value = slider_value;
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/brightness", true);
+		xhttp.send("blue=" + slider_value);
+
+	}
+
+
+
+
+
+
+
+	// when clicked rollback
+	function downgrade() {
+		console.log("rollback");
+
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/rollback", true);
+		xhttp.send("name=Hello");
+
+	}
+
+	/*
+	// when clicked rollback
+	function downgrade() {
+	console.log("rollback");
+	  var test;
+	  if (confirm("Are you sure you want to rollback to V.1.0?")) {
+		test = document.getElementById("FW_version").innerText;
+		console.log(test);
+		if(test === "1.0.0"){
+			console.log("if ok");
+				var popup = document.getElementById("myPopup2");
+				if(!popup.classList.contains("show")){
+					document.getElementById("myPopup2").innerHTML = "Already a v.1.0.0";
+					popup.classList.add("show");
+					setTimeout(()=>{popup.classList.remove("show");}, 3000);
+				}
+		}
+		else{
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST", "/rollback", true);
+			xhttp.send("name=Hello");
+		}
+	  } 
+	  else {
+	  }
+	
+	}
+	*/
+
+	function update_device() {
+		var txt;
+		console.log("hello")
+		if (confirm("Are you sure you want to start FOTA?")) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST", "/update", true);
+			xhttp.send("name=Hello");
+			txt = "You pressed OK!";
+		} else {
+			txt = "You pressed Cancel!";
+		}
+		document.getElementById("demo").innerHTML = txt;
+	}
+
+
+
+
+
+
+
+	function setpath() {
+		console.log("set path");
+		var default_path = document.getElementById("newfile").files[0].name;
+		document.getElementById("filepath").value = default_path;
+	}
+	function upload() {
+		console.log("upload");
+		var filePath = document.getElementById("filepath").value;
+		var ext = filePath.match(/\.(.+)$/)[1];
+		switch (ext) {
+			case 'bin':
+				break;
+			default:
+				alert('not allowed');
+				return
+		}
+		var upload_path = "/upload/" + filePath;
+		var fileInput = document.getElementById("newfile").files;
+
+		/* Max size of an individual file. Make sure this
+		 * value is same as that set in file_server.c */
+		var MAX_FILE_SIZE = 1700 * 1024;
+		var MAX_FILE_SIZE_STR = "1700KB";
+
+		if (fileInput.length == 0) {
+			alert("No file selected!");
+		} else if (filePath.length == 0) {
+			alert("File path on server is not set!");
+		} else if (filePath.indexOf(' ') >= 0) {
+			alert("File path on server cannot have spaces!");
+		} else if (filePath[filePath.length - 1] == '/') {
+			alert("File name not specified after path!");
+		} else if (fileInput[0].size > 1700 * 1024) {
+			alert("File size must be less than 1700KB!");
+		} else {
+			document.getElementById("newfile").disabled = true;
+			document.getElementById("filepath").disabled = true;
+			document.getElementById("upload").disabled = true;
+
+			var file = fileInput[0];
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState == 4) {
+					if (xhttp.status == 200) {
+						document.open();
+						document.write(xhttp.responseText);
+						document.close();
+					} else if (xhttp.status == 0) {
+						alert("Server closed the connection abruptly!");
+						location.reload()
+					} else {
+						alert(xhttp.status + " Error!\n" + xhttp.responseText);
+						location.reload()
+					}
+				}
+			};
+			xhttp.open("POST", upload_path, true);
+			xhttp.send(file);
+		}
+	}
+
+
+
+
+
+
+
+
+
+	function upload_flash() {
+		console.log("uploadd and flash");
+		var filePath = document.getElementById("filepath").value;
+		if (filePath == "") {
+			var popup = document.getElementById("myPopup1");
+			if (!popup.classList.contains("show")) {
+				document.getElementById("myPopup1").innerHTML = "Select a file first";
+				popup.classList.add("show");
+				setTimeout(() => { popup.classList.remove("show"); }, 3000);
+			}
+			return;
+		}
+
+		var ext = filePath.match(/\.(.+)$/)[1];
+		switch (ext) {
+			case 'bin':
+				break;
+			default:
+				var popup = document.getElementById("myPopup1");
+				if (!popup.classList.contains("show")) {
+					document.getElementById("myPopup1").innerHTML = "Only .bin files are allowed";
+					popup.classList.add("show");
+					setTimeout(() => { popup.classList.remove("show"); }, 3000);
+				}
+				return
+		}
+		var upload_path = "/upload_flash/" + filePath;
+		var fileInput = document.getElementById("newfile").files;
+
+		/* Max size of an individual file. Make sure this
+		 * value is same as that set in file_server.c */
+		var MAX_FILE_SIZE = 1700 * 1024;
+		var MAX_FILE_SIZE_STR = "1700KB";
+
+		if (fileInput.length == 0) {
+			alert("No file selected!");
+		} else if (filePath.length == 0) {
+			alert("File path on server is not set!");
+		} else if (filePath.indexOf(' ') >= 0) {
+			alert("File path on server cannot have spaces!");
+		} else if (filePath[filePath.length - 1] == '/') {
+			alert("File name not specified after path!");
+		} else if (fileInput[0].size > 1700 * 1024) {
+			alert("File size must be less than 1700KB!");
+		} else {
+			document.getElementById("newfile").disabled = true;
+			document.getElementById("filepath").disabled = true;
+			document.getElementById("upload_flash").disabled = true;
+
+			var file = fileInput[0];
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState == 4) {
+					if (xhttp.status == 200) {
+						document.open();
+						document.write(xhttp.responseText);
+						document.close();
+					} else if (xhttp.status == 0) {
+						alert("Server closed the connection abruptly!");
+						location.reload()
+					} else {
+						alert(xhttp.status + " Error!\n" + xhttp.responseText);
+						location.reload()
+					}
+				}
+			};
+			xhttp.open("POST", upload_path, true);
+			xhttp.send(file);
+		}
+	}
+
+
+var colorhex = "#FF0000";
+var color = "#FF0000";
+var colorObj = w3color(color);
+
+	function mouseOverColor(hex){
+		document.getElementById("divpreview").style.visibility = "visible";
+		document.getElementById("divpreview").style.backgroundColor = hex;
+    	document.body.style.cursor = "pointer";
+	}
+
+	function mouseOutMap() {
+    if (hh == 0) {
+        document.getElementById("divpreview").style.visibility = "hidden";
+    } else {
+      hh = 0;
+    }
+    document.getElementById("divpreview").style.backgroundColor = colorObj.toHexString();
+    document.body.style.cursor = "";
+}
+
+var hh = 0;
+
+function clickColor(hex, seltop, selleft, html5) {
+    var c, cObj, colormap, areas, i, areacolor, cc;
+    if (html5 && html5 == 5)  {
+        c = document.getElementById("html5colorpicker").value;
+    } else {
+        if (hex == 0)  {
+            c = document.getElementById("entercolor").value;
+            c = c.replace(/;/g, ","); //replace any semicolon with a comma
+        } else {
+            c = hex;
+        }
+    }
+	
+}
+
+
+</script>
+
+</body>
+
+</html>
