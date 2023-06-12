@@ -65,7 +65,11 @@ void app_main(void)
     // RGB_fade_in_out(&rgb_params);
 
 
-    xTaskCreate(RGB_running_rainbow,"RGB_running_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
+    //xTaskCreate(RGB_running_rainbow,"RGB_running_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
+
+    //xTaskCreate(RGB_sine_rainbow,"RGB_sine_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
+
+
     xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart
 
     //RGB_set_red(255);

@@ -6,6 +6,69 @@
 static const char *TAG = "example";
 
 
+
+
+
+
+const uint8_t lights[360]=
+{
+  0,   0,   0,   0,   0,   1,   1,   2, 
+  2,   3,   4,   5,   6,   7,   8,   9, 
+ 11,  12,  13,  15,  17,  18,  20,  22, 
+ 24,  26,  28,  30,  32,  35,  37,  39, 
+ 42,  44,  47,  49,  52,  55,  58,  60, 
+ 63,  66,  69,  72,  75,  78,  81,  85, 
+ 88,  91,  94,  97, 101, 104, 107, 111, 
+114, 117, 121, 124, 127, 131, 134, 137, 
+141, 144, 147, 150, 154, 157, 160, 163, 
+167, 170, 173, 176, 179, 182, 185, 188, 
+191, 194, 197, 200, 202, 205, 208, 210, 
+213, 215, 217, 220, 222, 224, 226, 229, 
+231, 232, 234, 236, 238, 239, 241, 242, 
+244, 245, 246, 248, 249, 250, 251, 251, 
+252, 253, 253, 254, 254, 255, 255, 255, 
+255, 255, 255, 255, 254, 254, 253, 253, 
+252, 251, 251, 250, 249, 248, 246, 245, 
+244, 242, 241, 239, 238, 236, 234, 232, 
+231, 229, 226, 224, 222, 220, 217, 215, 
+213, 210, 208, 205, 202, 200, 197, 194, 
+191, 188, 185, 182, 179, 176, 173, 170, 
+167, 163, 160, 157, 154, 150, 147, 144, 
+141, 137, 134, 131, 127, 124, 121, 117, 
+114, 111, 107, 104, 101,  97,  94,  91, 
+ 88,  85,  81,  78,  75,  72,  69,  66, 
+ 63,  60,  58,  55,  52,  49,  47,  44, 
+ 42,  39,  37,  35,  32,  30,  28,  26, 
+ 24,  22,  20,  18,  17,  15,  13,  12, 
+ 11,   9,   8,   7,   6,   5,   4,   3, 
+  2,   2,   1,   1,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0, 
+  0,   0,   0,   0,   0,   0,   0,   0};
+
+
+
+
+
+
+
+
+
+
+
+
 led_strip_handle_t led_strip;
 struct rgb_color_s strip_color;
 struct rgb_params_s rgb_params; // global variable for passing parameters to timers as arguments
@@ -14,8 +77,26 @@ esp_timer_handle_t fading_lights_timer = NULL; // this is main controller task t
 esp_timer_handle_t running_lights_timer = NULL; // this is main controller task timer 
 
 #define LED_STRIP_BLINK_GPIO  14
-#define LED_STRIP_LED_NUMBERS 110
+#define LED_STRIP_LED_NUMBERS 117
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -65,7 +146,14 @@ void RGB_setup(){
     ESP_LOGI(TAG, "Start blinking LED strip");
     ESP_ERROR_CHECK(led_strip_clear(led_strip));
 
-
+    for(int i = 0; i< 150;i++){
+        for(int j = 0; j <LED_STRIP_LED_NUMBERS;j++)
+        {
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, j, i, i, i));
+        }
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+        vTaskDelay(20/portTICK_PERIOD_MS);
+    }
 
     // rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
     // rgb_params.red_color = 204;
@@ -289,30 +377,76 @@ void RGB_running_lights(struct rgb_params_s* rgb_parameters){
 
 
 
+
+
+
+
+
+void led_strip_hsv2rgb(uint32_t h, uint32_t s, uint32_t v, uint32_t *r, uint32_t *g, uint32_t *b)
+{
+    h %= 360; // h -> [0,360]
+    uint32_t rgb_max = v * 2.55f;
+    uint32_t rgb_min = rgb_max * (100 - s) / 100.0f;
+
+    uint32_t i = h / 60;
+    uint32_t diff = h % 60;
+
+    // RGB adjustment amount by hue
+    uint32_t rgb_adj = (rgb_max - rgb_min) * diff / 60;
+
+    switch (i) {
+    case 0:
+        *r = rgb_max;
+        *g = rgb_min + rgb_adj;
+        *b = rgb_min;
+        break;
+    case 1:
+        *r = rgb_max - rgb_adj;
+        *g = rgb_max;
+        *b = rgb_min;
+        break;
+    case 2:
+        *r = rgb_min;
+        *g = rgb_max;
+        *b = rgb_min + rgb_adj;
+        break;
+    case 3:
+        *r = rgb_min;
+        *g = rgb_max - rgb_adj;
+        *b = rgb_max;
+        break;
+    case 4:
+        *r = rgb_min + rgb_adj;
+        *g = rgb_min;
+        *b = rgb_max;
+        break;
+    default:
+        *r = rgb_max;
+        *g = rgb_min;
+        *b = rgb_max - rgb_adj;
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
 void RGB_running_rainbow(void *argument)
 {   
-    uint8_t mode = 1; 
+    uint8_t mode = 3; 
     uint8_t rainbow_segments = 7; //red,ornage,yellow,green,blue,indigo,violet
-    uint8_t red_in;
-    uint8_t orange_in;
-    uint8_t yellow_in;
-    uint8_t green_in;
-    uint8_t blue_in;
-    uint8_t indigo_in;
-    uint8_t violet_in;
     uint8_t index_test = 0;
-    uint8_t led_index;
+    uint16_t led_index = 0;
     
     // 0 means back and forth
     // 1 means go forward and start over without going backwards
     bool direction = 0;
-    uint16_t led_index_red = 0;
-    uint16_t led_index_orange = 1;
-    uint16_t led_index_yellow = 2;
-    uint16_t led_index_green = 3;
-    uint16_t led_index_blue = 4;
-    uint16_t led_index_indigo = 5;
-    uint16_t led_index_violet = 6;
 
     uint16_t led_index_red_ro;
     uint16_t led_index_orange_ro;
@@ -323,9 +457,13 @@ void RGB_running_rainbow(void *argument)
     uint16_t led_index_violet_ro;
 
 
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
+    uint32_t red = 0;
+    uint32_t green = 0;
+    uint32_t blue = 0;
+    uint16_t hue = 0;
+    uint16_t start_rgb = 0;
+
+
   	for (;;)
 	{	
         //MODE 0
@@ -358,13 +496,13 @@ void RGB_running_rainbow(void *argument)
 
             ESP_ERROR_CHECK(led_strip_clear(led_strip));
 
-            led_index_red_ro = (led_index_red % LED_STRIP_LED_NUMBERS);
-            led_index_orange_ro = (led_index_orange % LED_STRIP_LED_NUMBERS);
-            led_index_yellow_ro = (led_index_yellow % LED_STRIP_LED_NUMBERS);
-            led_index_green_ro = (led_index_green % LED_STRIP_LED_NUMBERS);
-            led_index_blue_ro = (led_index_blue % LED_STRIP_LED_NUMBERS);
-            led_index_indigo_ro = (led_index_indigo % LED_STRIP_LED_NUMBERS);
-            led_index_violet_ro = (led_index_violet % LED_STRIP_LED_NUMBERS);
+            led_index_red_ro = (led_index % LED_STRIP_LED_NUMBERS);
+            led_index_orange_ro = ( (led_index+1) % LED_STRIP_LED_NUMBERS);
+            led_index_yellow_ro = ( (led_index+2) % LED_STRIP_LED_NUMBERS);
+            led_index_green_ro = ( (led_index+3) % LED_STRIP_LED_NUMBERS);
+            led_index_blue_ro = ( (led_index+4) % LED_STRIP_LED_NUMBERS);
+            led_index_indigo_ro = ( (led_index+5) % LED_STRIP_LED_NUMBERS);
+            led_index_violet_ro = ( (led_index+6) % LED_STRIP_LED_NUMBERS);
 
 
             ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_red_ro, 255, 0, 0));//red
@@ -374,20 +512,75 @@ void RGB_running_rainbow(void *argument)
             ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_blue_ro, 0, 0, 255)); //blue
             ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_indigo_ro, 75, 0, 130)); //indigo
             ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_violet_ro, 148, 0, 211)); //violet
-            led_index_red++;
-            led_index_orange++;
-            led_index_yellow++;
-            led_index_green++;
-            led_index_blue++;
-            led_index_indigo++;
-            led_index_violet++;
+            led_index++;
+
             ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
         }
-		vTaskDelay(50/portTICK_PERIOD_MS);
+
+
+
+        //MODE 1
+        else if (mode == 2){
+            //divide total leds by the rainbow segments to determine how many LEDS per segment
+            ESP_ERROR_CHECK(led_strip_clear(led_strip));
+            uint8_t leds_per_segment = LED_STRIP_LED_NUMBERS/rainbow_segments;
+
+            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+        }
+
+
+
+
+
+        else if (mode == 3){
+
+                for (int j = 0; j < LED_STRIP_LED_NUMBERS; j ++) {
+                    // Build RGB values
+                    hue = j * 360 / LED_STRIP_LED_NUMBERS + start_rgb;
+                    led_strip_hsv2rgb(hue, 100, 100, &red, &green, &blue);
+                    // Write RGB values to strip driver
+                    //ESP_ERROR_CHECK(strip->set_pixel(strip, j, red, green, blue));
+                    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, j, red, green, blue)); //violet
+                }
+                // Flush RGB values to LEDs
+
+                ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+                vTaskDelay(pdMS_TO_TICKS(1000));
+                ESP_ERROR_CHECK(led_strip_clear(led_strip));
+                vTaskDelay(pdMS_TO_TICKS(1000));
+            
+            start_rgb += 60;
+        }
+		//vTaskDelay(50/portTICK_PERIOD_MS);
         
     }
 
 }
 
 
+
+void RGB_sine_rainbow(void *argument)
+{   
+    uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
+
+    for (;;)
+	{
+        //ESP_ERROR_CHECK(led_strip_clear(led_strip));
+
+        for (int k=0; k<360; k++)
+        { 
+            for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
+                sineLED(i,k+(offset*i));
+            } 
+            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+            vTaskDelay(30/portTICK_PERIOD_MS);
+        }
+    }
+}
+
+
+void sineLED(uint16_t LED, int angle)
+{
+    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip,LED, lights[(angle+120)%360], lights[(angle+0)%360],  lights[(angle+240)%360]));
+}
 
