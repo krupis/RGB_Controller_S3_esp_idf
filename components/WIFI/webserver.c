@@ -15,11 +15,12 @@ static esp_err_t handle_animation_change(httpd_req_t *req);
 
 /* Max size of an individual file. Make sure this
  * value is same as that set in upload_script.html */
-#define MAX_FILE_SIZE   (200*1024) // 200 KB
-#define MAX_FILE_SIZE_STR "200KB"
+#define MAX_FILE_SIZE   (1500*1024) // 200 KB
+#define MAX_FILE_SIZE_STR "1500KB"
 
 /* Scratch buffer size */
-#define SCRATCH_BUFSIZE  8192
+#define SCRATCH_BUFSIZE  4096
+#define SEND_DATA   2048 // data is being written from spiffs to ota partition in 2048b chunks
 
 struct file_server_data {
     /* Base path of file storage */
@@ -304,6 +305,136 @@ static esp_err_t download_get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+
+
+
+
+
+
+
+
+
+
+// Handler to upload a file onto the server 
+static esp_err_t upload_and_flash_post_handler(httpd_req_t *req){
+    
+    printf("upload and flash handler \n");
+    char filepath[FILE_PATH_MAX];
+    const char *filename = get_path_from_uri(filepath, ((struct file_server_data *)req->user_ctx)->base_path,
+                                             req->uri + sizeof("/upload") - 1, sizeof(filepath));
+
+    // File cannot be larger than a limit 
+    if (req->content_len > MAX_FILE_SIZE) {
+        ESP_LOGE("UPLOAD", "File too large : %d bytes", req->content_len);
+        // Respond with 400 Bad Request 
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST,
+                            "File size must be less than "
+                            MAX_FILE_SIZE_STR "!");
+        //Return failure to close underlying connection else the
+        // incoming file content will keep the socket busy 
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI("UPLOAD", "Receiving file : %s...", filename);
+    //Retrieve the pointer to scratch buffer for temporary storage 
+    
+    int received;
+    esp_err_t ret;
+    
+    const esp_partition_t *update_partition;
+    const esp_partition_t *configured = esp_ota_get_boot_partition();
+    const esp_partition_t *running  = esp_ota_get_running_partition();
+    esp_ota_handle_t well_done_handle = 0;  // Handler for OTA update. 
+    if (configured != running) {
+        // ESP_LOGW("UPDATE", "Configured OTA boot partition at offset 0x%08x, but running from offset 0x%08x",
+        //                 configured->address, running->address);
+        // ESP_LOGW("UPDATE", "(This can happen if either the OTA boot data or preferred boot image become corrupted somehow.)"
+        //                 );
+    }
+    // ESP_LOGI("UPDATE", "Running partition type %d subtype %d (offset 0x%08x)",
+    //                 running->type, running->subtype, running->address);
+
+    // ESP_LOGI("UPDATE", "Starting OTA example");
+    // It finds the partition where it should write the firmware
+    update_partition = esp_ota_get_next_update_partition(NULL);
+    ESP_LOGI("UPDATE", "Writing to partition subtype %d at offset 0x%lu",
+                    update_partition->subtype, update_partition->address);
+    assert(update_partition != NULL);
+    
+    // Reset of this partition
+    ESP_ERROR_CHECK(esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &well_done_handle));
+
+   
+    char buf[SEND_DATA];
+    // Init of the buffer
+    memset(buf, 0, sizeof(buf));
+    // Content length of the request gives
+    // the size of the file being uploaded 
+    int remaining = req->content_len;
+    while (remaining > 0) {
+        uint16_t read_chunk_length = MIN(remaining, SEND_DATA);
+        vTaskDelay(20/portTICK_PERIOD_MS);
+        ESP_LOGI("UPLOAD", "Remaining size : %d", remaining);
+        // Receive the file part by part into a buffer 
+        if ((received = httpd_req_recv(req, buf, read_chunk_length)) <= 0) {
+            if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+                continue;
+            }
+            ESP_LOGE("UPLOAD", "File reception failed!");
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to receive file");
+            return ESP_FAIL;
+        }
+        //printf("data actually received received=%u \n",received);
+        //printf("read_chunk_length=%u \n",read_chunk_length);
+        ret = esp_ota_write(well_done_handle, buf, received);
+        if(ret != ESP_OK){
+            ESP_LOGE("UPDATE", "Firmware upgrade failed");
+            while (1) {
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+            }
+            return ESP_FAIL;
+        }
+        
+    remaining -= received;
+    }
+
+
+    ESP_LOGI("UPLOAD", "File reception complete");
+
+    // Redirect onto root to see the updated file list
+    httpd_resp_set_status(req, "303 See Other");
+    httpd_resp_set_hdr(req, "Location", "/");
+#ifdef CONFIG_EXAMPLE_HTTPD_CONN_CLOSE_HEADER
+    httpd_resp_set_hdr(req, "Connection", "close");
+#endif
+    httpd_resp_sendstr(req, "File uploaded successfully");
+
+    // If you are here it means there are no problems!
+    ESP_ERROR_CHECK(esp_ota_end(well_done_handle));
+
+    // OTA partition configuration
+    ESP_ERROR_CHECK(esp_ota_set_boot_partition(update_partition));
+    ESP_LOGI("UPDATE", "Restarting...");
+    // REBOOT!!!!!
+    esp_restart();
+    return ESP_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Handler to upload a file onto the server */
 static esp_err_t upload_post_handler(httpd_req_t *req)
 {
@@ -483,6 +614,7 @@ esp_err_t example_start_file_server(const char *base_path)
 
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.stack_size = 8096;
 
     /* Use the URI wildcard matching function in order to
      * allow the same handler to respond to multiple different
@@ -522,6 +654,15 @@ esp_err_t example_start_file_server(const char *base_path)
     httpd_register_uri_handler(server, &uri_animation);
 
 
+
+
+    httpd_uri_t file_upload_flash = {
+        .uri       = "/upload_flash/*",   // Match all URIs of type /upload/path/to/file
+        .method    = HTTP_POST,
+        .handler   = upload_and_flash_post_handler,
+        .user_ctx  = server_data    // Pass server data as context
+    };
+    httpd_register_uri_handler(server, &file_upload_flash);
 
 
     /* URI handler for uploading files to server */

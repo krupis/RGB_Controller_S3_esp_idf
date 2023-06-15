@@ -49,6 +49,10 @@ void app_main(void)
     ESP_ERROR_CHECK(example_start_file_server("/spiffs"));
 
     RGB_setup();
+    xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
+
+
+    //RGB_turn_index_led(20,100,100,100);
 
     // rgb_params.ramp_up_time = 3000; 
     // strip_color.red = 100;

@@ -7,7 +7,8 @@ static const char *TAG = "example";
 
 
 
-
+static void IRAM_ATTR IR_sensor_handler(void* arg);
+static QueueHandle_t gpio_evt_queue = NULL;
 
 
 const uint8_t lights[360]=
@@ -77,6 +78,7 @@ esp_timer_handle_t fading_lights_timer = NULL; // this is main controller task t
 esp_timer_handle_t running_lights_timer = NULL; // this is main controller task timer 
 
 #define LED_STRIP_BLINK_GPIO  14
+//#define LED_STRIP_LED_NUMBERS 117
 #define LED_STRIP_LED_NUMBERS 117
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
 
@@ -95,7 +97,18 @@ esp_timer_handle_t running_lights_timer = NULL; // this is main controller task 
 
 
 
+static void IRAM_ATTR button_handler(void* arg)
+{
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    uint32_t gpio_num = (uint32_t) arg;
 
+    xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
+    esp_rom_printf("IR sensor handler toggled \n");
+    if( pxHigherPriorityTaskWoken )
+    {
+        portYIELD_FROM_ISR ();
+    }
+}
 
 
 
@@ -103,6 +116,31 @@ esp_timer_handle_t running_lights_timer = NULL; // this is main controller task 
 
 
 void RGB_setup(){
+
+
+
+    gpio_config_t io_conf;
+    //disable interrupt
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    //set as output mode
+    io_conf.mode = GPIO_MODE_INPUT ;
+    //bit mask of the pins that you want to set,e.g.GPIO18/19
+    io_conf.pin_bit_mask = GPIO_BUTTON_INPUT_SEL;
+    //disable pull-down mode
+    io_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+    //disable pull-up mode
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    //configure GPIO with the given settings
+    gpio_config(&io_conf);
+
+    gpio_evt_queue = xQueueCreate(2, sizeof(uint32_t));
+    //start gpio task
+    xTaskCreate(Button_detection_task, "Button_detection_task", 2048, NULL, 10, NULL);
+
+    gpio_install_isr_service(0);
+    //hook isr handler for specific gpio pin
+    gpio_isr_handler_add(BUTTON_1, button_handler, (void*) BUTTON_1);
+
 
     const esp_timer_create_args_t fading_lights = {
             .callback = &RGB_fade_in_out_callback,
@@ -146,14 +184,12 @@ void RGB_setup(){
     ESP_LOGI(TAG, "Start blinking LED strip");
     ESP_ERROR_CHECK(led_strip_clear(led_strip));
 
-    for(int i = 0; i< 150;i++){
-        for(int j = 0; j <LED_STRIP_LED_NUMBERS;j++)
-        {
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, j, i, i, i));
-        }
-        ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-        vTaskDelay(20/portTICK_PERIOD_MS);
-    }
+
+
+
+
+
+
 
     // rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
     // rgb_params.red_color = 204;
@@ -584,3 +620,64 @@ void sineLED(uint16_t LED, int angle)
     ESP_ERROR_CHECK(led_strip_set_pixel(led_strip,LED, lights[(angle+120)%360], lights[(angle+0)%360],  lights[(angle+240)%360]));
 }
 
+
+
+
+
+
+void RGB_fading_up(){
+    for(int i = 0; i< 150;i++){
+        for(int j = 0; j <LED_STRIP_LED_NUMBERS;j++)
+        {
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, j, i, i, i));
+        }
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+        vTaskDelay(20/portTICK_PERIOD_MS);
+    }
+}
+
+void RGB_meet_in_the_middle(void *argument){
+    uint8_t led_num = 0;
+    for (;;)
+	{
+        //printf("led_num = %u \n",led_num);
+        //printf("(LED_STRIP_LED_NUMBERS-1)-led_num = %u \n",(LED_STRIP_LED_NUMBERS-1)-led_num);
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_num, 150, 150, 150)); //violet
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, (LED_STRIP_LED_NUMBERS-1)-led_num, 150, 150, 150)); //violet
+        led_num ++;
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+        vTaskDelay(50/portTICK_PERIOD_MS);
+
+        //if value does not divide by 2, turn on the last led
+        if(led_num >= (LED_STRIP_LED_NUMBERS/2)){
+            if(LED_STRIP_LED_NUMBERS %2 != 0){
+                ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_num, 150, 150, 150)); //violet
+                ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+            }
+            vTaskDelete(0);
+        }
+        
+    }
+}
+
+
+void RGB_turn_index_led(uint8_t index, uint8_t red, uint8_t green, uint8_t blue){
+    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, index, red, green, blue)); //violet
+    ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+}
+
+
+
+
+void Button_detection_task(void* arg)
+{
+    
+    uint32_t io_num;
+    for(;;) {
+        if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) { 
+
+            printf("button click detected \n");
+            //vTaskDelay(100/portTICK_PERIOD_MS);
+        }
+    }
+}

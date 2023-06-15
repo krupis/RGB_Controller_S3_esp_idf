@@ -13,11 +13,16 @@
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
 #include "esp_http_server.h"
+#include "esp_https_ota.h"
+#include "esp_ota_ops.h"
 #include "RGB.h"
 
 
 esp_err_t example_mount_storage(const char* base_path);
 esp_err_t example_start_file_server(const char *base_path);
+
+
+
 
 
 #endif
