@@ -9,6 +9,8 @@ static const char *TAG = "example";
 
 static void IRAM_ATTR IR_sensor_handler(void* arg);
 static QueueHandle_t gpio_evt_queue = NULL;
+TaskHandle_t rainbow_task;
+
 
 
 const uint8_t lights[360]=
@@ -76,10 +78,11 @@ struct rgb_params_s rgb_params; // global variable for passing parameters to tim
 
 esp_timer_handle_t fading_lights_timer = NULL; // this is main controller task timer 
 esp_timer_handle_t running_lights_timer = NULL; // this is main controller task timer 
+esp_timer_handle_t rainbow_lights_timer = NULL; // this is main controller task timer
 
 #define LED_STRIP_BLINK_GPIO  14
-//#define LED_STRIP_LED_NUMBERS 117
 #define LED_STRIP_LED_NUMBERS 117
+//#define LED_STRIP_LED_NUMBERS 20
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
 
 
@@ -160,6 +163,15 @@ void RGB_setup(){
     ESP_ERROR_CHECK(esp_timer_create(&running_lights, &running_lights_timer));
 
 
+    const esp_timer_create_args_t rainbow_lights = {
+        .callback = &RGB_rainbow_lights_callback,
+        /* name is optional, but may help identify the timer when debugging */
+        .arg = &rgb_params,
+        .name = "rainbow lights"
+    };
+    ESP_ERROR_CHECK(esp_timer_create(&rainbow_lights, &rainbow_lights_timer));
+
+
     strip_color.red = 0;
     strip_color.blue = 0;
     strip_color.green = 0;
@@ -183,22 +195,6 @@ void RGB_setup(){
     bool led_on_off = false;
     ESP_LOGI(TAG, "Start blinking LED strip");
     ESP_ERROR_CHECK(led_strip_clear(led_strip));
-
-
-
-
-
-
-
-
-    // rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
-    // rgb_params.red_color = 204;
-    // rgb_params.green_color = 51;
-    // rgb_params.blue_color = 255;
-
-    
-    // RGB_fade_in_out(&rgb_params);
-
 }
 
 
@@ -258,6 +254,11 @@ void RGB_set_rgb(uint8_t red,uint8_t green,uint8_t blue){
     
 }
 
+void RGB_clear_strip(){
+    ESP_ERROR_CHECK(led_strip_clear(led_strip));
+}
+
+
 
 
 
@@ -296,8 +297,6 @@ void RGB_fade_in_out_callback(void* arg)
     }
 
 }
-
-
 
 void RGB_running_lights_callback(void* arg)
 {
@@ -355,6 +354,46 @@ void RGB_running_lights_callback(void* arg)
 
 
 
+
+
+
+    // uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
+    // for (;;)
+	// {
+    //     for (int k=0; k<360; k++)
+    //     { 
+    //         for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
+    //             sineLED(i,k+(offset*i));
+    //         } 
+    //         ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+    //         vTaskDelay(30/portTICK_PERIOD_MS);
+    //     }
+    // }
+
+
+void RGB_rainbow_lights_callback(void* arg)
+{
+    static uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
+    static uint8_t led_number = 0;
+    static uint16_t angle = 0;
+
+
+    for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
+        sineLED(i,angle+(offset*i));
+    }
+    angle++;
+    if(angle == 359){
+        angle = 0;
+    }
+    ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+    
+    
+}
+
+
+
+
+
 // /**
 //  * @brief 
 //  * RGB_fade_in_out is simillar tu running lights except that it controls all leds at once whereas running lights conrol LEDS one by one
@@ -402,17 +441,22 @@ void RGB_fade_in_out(struct rgb_params_s* rgb_parameters){
 //  */
 // //this function sets the required timer interval for ramp up/ ramp down time
 void RGB_running_lights(struct rgb_params_s* rgb_parameters){
-
 // if you want 44 LEDS to turn ON in 3 seconds, each LED will have:
 // 3000/44 = 68 ms time
-
     if(esp_timer_is_active(running_lights_timer) == 0){
         ESP_ERROR_CHECK(esp_timer_start_periodic(running_lights_timer, ((rgb_parameters->ramp_up_time/LED_STRIP_LED_NUMBERS)*1000))); //
+        printf("running lights timer started \n");
     }
 }
 
 
+void RGB_rainbow_lights(struct rgb_params_s* rgb_parameters){
 
+    if(esp_timer_is_active(rainbow_lights_timer) == 0){
+        ESP_ERROR_CHECK(esp_timer_start_periodic(rainbow_lights_timer, 100000)); //
+        printf("rainbow lights timer started \n");
+    }
+}
 
 
 
@@ -464,161 +508,49 @@ void led_strip_hsv2rgb(uint32_t h, uint32_t s, uint32_t v, uint32_t *r, uint32_t
     }
 }
 
-
-
-
-
-
-
-
-
-
-void RGB_running_rainbow(void *argument)
-{   
-    uint8_t mode = 3; 
-    uint8_t rainbow_segments = 7; //red,ornage,yellow,green,blue,indigo,violet
-    uint8_t index_test = 0;
-    uint16_t led_index = 0;
-    
-    // 0 means back and forth
-    // 1 means go forward and start over without going backwards
-    bool direction = 0;
-
-    uint16_t led_index_red_ro;
-    uint16_t led_index_orange_ro;
-    uint16_t led_index_yellow_ro;
-    uint16_t led_index_green_ro;
-    uint16_t led_index_blue_ro;
-    uint16_t led_index_indigo_ro;
-    uint16_t led_index_violet_ro;
-
-
-    uint32_t red = 0;
-    uint32_t green = 0;
-    uint32_t blue = 0;
-    uint16_t hue = 0;
-    uint16_t start_rgb = 0;
-
-
-  	for (;;)
-	{	
-        //MODE 0
-        if (mode == 0){
-            if(direction == 0){
-                led_index++;
-                if(led_index >= LED_STRIP_LED_NUMBERS){
-                    direction = 1;
-                }
-                else{
-                    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index, 100, 0, 0));
-                }
-            }
-            
-            else if(direction == 1){
-                led_index--;
-                if(led_index <= 0){
-                    direction = 0;
-                }
-                else{
-                ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index, 0, 0, 0));
-                }
-            }
-            ESP_ERROR_CHECK(led_strip_refresh(led_strip));   
-        }
-
-
-        //MODE 1
-        else if (mode == 1){
-
-            ESP_ERROR_CHECK(led_strip_clear(led_strip));
-
-            led_index_red_ro = (led_index % LED_STRIP_LED_NUMBERS);
-            led_index_orange_ro = ( (led_index+1) % LED_STRIP_LED_NUMBERS);
-            led_index_yellow_ro = ( (led_index+2) % LED_STRIP_LED_NUMBERS);
-            led_index_green_ro = ( (led_index+3) % LED_STRIP_LED_NUMBERS);
-            led_index_blue_ro = ( (led_index+4) % LED_STRIP_LED_NUMBERS);
-            led_index_indigo_ro = ( (led_index+5) % LED_STRIP_LED_NUMBERS);
-            led_index_violet_ro = ( (led_index+6) % LED_STRIP_LED_NUMBERS);
-
-
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_red_ro, 255, 0, 0));//red
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_orange_ro, 255, 127, 0)); //orange
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_yellow_ro, 255, 255, 20)); //yellow
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_green_ro, 0, 255, 0)); //green
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_blue_ro, 0, 0, 255)); //blue
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_indigo_ro, 75, 0, 130)); //indigo
-            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, led_index_violet_ro, 148, 0, 211)); //violet
-            led_index++;
-
-            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-        }
-
-
-
-        //MODE 1
-        else if (mode == 2){
-            //divide total leds by the rainbow segments to determine how many LEDS per segment
-            ESP_ERROR_CHECK(led_strip_clear(led_strip));
-            uint8_t leds_per_segment = LED_STRIP_LED_NUMBERS/rainbow_segments;
-
-            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-        }
-
-
-
-
-
-        else if (mode == 3){
-
-                for (int j = 0; j < LED_STRIP_LED_NUMBERS; j ++) {
-                    // Build RGB values
-                    hue = j * 360 / LED_STRIP_LED_NUMBERS + start_rgb;
-                    led_strip_hsv2rgb(hue, 100, 100, &red, &green, &blue);
-                    // Write RGB values to strip driver
-                    //ESP_ERROR_CHECK(strip->set_pixel(strip, j, red, green, blue));
-                    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, j, red, green, blue)); //violet
-                }
-                // Flush RGB values to LEDs
-
-                ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-                vTaskDelay(pdMS_TO_TICKS(1000));
-                ESP_ERROR_CHECK(led_strip_clear(led_strip));
-                vTaskDelay(pdMS_TO_TICKS(1000));
-            
-            start_rgb += 60;
-        }
-		//vTaskDelay(50/portTICK_PERIOD_MS);
-        
-    }
-
-}
-
-
-
-void RGB_sine_rainbow(void *argument)
-{   
-    uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
-
-    for (;;)
-	{
-        //ESP_ERROR_CHECK(led_strip_clear(led_strip));
-
-        for (int k=0; k<360; k++)
-        { 
-            for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
-                sineLED(i,k+(offset*i));
-            } 
-            ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-            vTaskDelay(30/portTICK_PERIOD_MS);
-        }
-    }
-}
-
-
 void sineLED(uint16_t LED, int angle)
 {
     ESP_ERROR_CHECK(led_strip_set_pixel(led_strip,LED, lights[(angle+120)%360], lights[(angle+0)%360],  lights[(angle+240)%360]));
 }
+
+
+
+
+// void RGB_sine_rainbow(void *argument)
+// {   
+//     uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
+//     for (;;)
+// 	{
+//         for (int k=0; k<360; k++)
+//         { 
+//             for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
+//                 sineLED(i,k+(offset*i));
+//             } 
+//             ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+//             vTaskDelay(30/portTICK_PERIOD_MS);
+//         }
+//     }
+// }
+
+// void RGB_rainbow(){
+//     xTaskCreate(RGB_sine_rainbow,"RGB_sine_rainbow",10000,NULL,5,&rainbow_task); // receiving commands from main uart
+// }
+
+// void Delete_RGB_rainbow_task(){
+//     if(rainbow_task != NULL){
+//         ESP_LOGW(TAG,"delete rainbow task");
+//         vTaskDelete(rainbow_task);
+//         rainbow_task = NULL;
+
+//     }
+//     else{
+//         printf("Rainbow task is not running \n");
+//     }
+// }
+
+
+
+
 
 
 
@@ -634,6 +566,7 @@ void RGB_fading_up(){
         ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
         vTaskDelay(20/portTICK_PERIOD_MS);
     }
+    vTaskDelete(0);
 }
 
 void RGB_meet_in_the_middle(void *argument){
@@ -667,6 +600,44 @@ void RGB_turn_index_led(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 }
 
 
+
+
+void Stop_current_animation(){
+    if(fading_lights_timer != NULL){
+        if(esp_timer_is_active(fading_lights_timer) == 1){
+            ESP_LOGW("RGB","STOPPING fading lights timer");
+            ESP_ERROR_CHECK(esp_timer_stop(fading_lights_timer));
+            ESP_ERROR_CHECK(led_strip_clear(led_strip));
+        }
+    }
+    else{
+        printf("fading lights timer is null \n");
+    }
+
+
+    if(running_lights_timer != NULL){
+        if(esp_timer_is_active(running_lights_timer) == 1){
+            ESP_LOGW("RGB","STOPPING running lights timer");
+            ESP_ERROR_CHECK(esp_timer_stop(running_lights_timer));
+            ESP_ERROR_CHECK(led_strip_clear(led_strip));
+        }
+    }
+    else{
+        printf("running lights timer is null \n");
+    }
+
+    if(rainbow_lights_timer != NULL){
+        if(esp_timer_is_active(rainbow_lights_timer) == 1){
+            ESP_LOGW("RGB","STOPPING rainbow lights timer");
+            ESP_ERROR_CHECK(esp_timer_stop(rainbow_lights_timer));
+            ESP_ERROR_CHECK(led_strip_clear(led_strip));
+        }
+    }
+    else{
+        printf("rainbow lights timer is null \n");
+    }
+
+}
 
 
 void Button_detection_task(void* arg)

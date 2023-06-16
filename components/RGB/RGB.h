@@ -25,14 +25,17 @@ void RGB_set_green(uint8_t color);
 void RGB_set_blue(uint8_t color);
 void RGB_set_rgb(uint8_t red,uint8_t green,uint8_t blue);
 void RGB_turn_index_led(uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
+void RGB_clear_strip();
 
 
 void RGB_fade_in_out_callback(void* arg);
 void RGB_running_lights_callback(void* arg);
-void RGB_running_rainbow(void *argument);
-void RGB_sine_rainbow(void *argument);
+void RGB_rainbow_lights_callback(void* arg);
+
+
+//void RGB_sine_rainbow(void *argument);
 void sineLED(uint16_t LED, int angle);
-void sineLED_offset(uint16_t LED, int angle,int offset);
+
 
 
 
@@ -45,9 +48,6 @@ struct rgb_color_s{
 
 struct rgb_params_s{
     uint16_t ramp_up_time;
-    uint8_t red_color;
-    uint8_t green_color;
-    uint8_t blue_color;
     bool color_ramping;
     bool repeat;
 };
@@ -55,9 +55,14 @@ struct rgb_params_s{
 
 void RGB_running_lights(struct rgb_params_s* rgb_parameters);
 void RGB_fade_in_out(struct rgb_params_s* rgb_parameters);
+void RGB_rainbow_lights(struct rgb_params_s* rgb_parameters);
+
+//void Delete_RGB_rainbow_task();
+
+
 void RGB_meet_in_the_middle(void *argument);
 void RGB_fading_up();
-
+void Stop_current_animation();
 extern struct rgb_params_s rgb_params;
 extern struct rgb_color_s strip_color;
 

@@ -9,6 +9,7 @@ static const char* TEST_TAG = "TEST";
 
 
 
+
 void UART0_setup() {
     uart_config_t uart_config = {
         .baud_rate           = 115200,
@@ -103,7 +104,7 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
         return true;
     }
 
-        if (!strncmp("blue:", line,5))
+    if (!strncmp("blue:", line,5))
     {	
         if (!isdigit( (unsigned char)(line[5]) ))
 		{
@@ -119,6 +120,62 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
         RGB_set_blue(data_to_write);
         return true;
     }
+
+    if (!strncmp("running", line,7))
+    {	
+        Stop_current_animation();
+        rgb_params.ramp_up_time = 3000; 
+        strip_color.red = 100;
+        strip_color.blue = 100;
+        strip_color.green = 0;
+        rgb_params.color_ramping = 1;
+        RGB_running_lights(&rgb_params);
+        printf("Started rgb running lights animation \n");
+        return 0;
+    }
+
+    if (!strncmp("fading", line,6))
+    {	
+        
+        Stop_current_animation();
+        rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
+        strip_color.red = 56;
+        strip_color.blue = 100;
+        strip_color.green = 25;
+        RGB_fade_in_out(&rgb_params);
+        printf("Started rgb fading lights animation \n");
+        return 0;
+    }
+
+    if (!strncmp("rainbow", line,7))
+    {	
+        Stop_current_animation();
+        rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
+        RGB_rainbow_lights(&rgb_params);
+        printf("Started rgb rainbow lights animation \n");
+        return 0;
+    }
+
+    if (!strncmp("delete_rainbow_task", line,19))
+    {	
+        //Delete_RGB_rainbow_task();
+        return 0;
+    }
+    if (!strncmp("clear_strip", line,11))
+    {	
+        RGB_clear_strip();
+        return 0;
+    }
+    
+
+    
+    if (!strncmp("stop_animation", line,14))
+    {	  
+        Stop_current_animation();
+        printf("stop current animation command executed \n");
+        return 0;
+    }
+    
 
     return 0;
 
