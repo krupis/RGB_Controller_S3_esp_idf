@@ -841,58 +841,26 @@ static esp_err_t handle_animation_change(httpd_req_t *req) {
         if(strncmp(brightness_value,"fading",6) == 0){
  
             //check if timer is even created
-            if(running_lights_timer != NULL){
-                if(esp_timer_is_active(running_lights_timer) == 1){
-                    ESP_LOGW("POST_HANDLER","STOPPING running lights timer");
-                    ESP_ERROR_CHECK(esp_timer_stop(running_lights_timer));
-                }
-            }
-            else{
-                printf("running lights timer does not exist \n");
-            }
-            
-            if(fading_lights_timer != NULL){
-                printf("deleting timer and creating a new one \n");
-                if(esp_timer_is_active(fading_lights_timer) == 1){
-                    ESP_LOGW("POST_HANDLER","STOPPING fading lights timer");
-                    ESP_ERROR_CHECK(esp_timer_stop(fading_lights_timer));
-                }
-            }
+            Stop_current_animation();
             rgb_params.ramp_up_time = 3000;
             rgb_params.color_ramping = 1;
             rgb_params.repeat = 1;
             RGB_fade_in_out(&rgb_params);
-
         }
 
 
         else if(strncmp(brightness_value,"running",7) == 0){
-            printf("running word matched \n");
-            
-            if(fading_lights_timer != NULL){
-                if(esp_timer_is_active(fading_lights_timer) == 1){
-                    ESP_LOGW("POST_HANDLER","STOPPING fading lights timer");
-                    ESP_ERROR_CHECK(esp_timer_stop(fading_lights_timer));
-                }
-            }
-            else{
-                printf("fading lights timer does not exist \n");
-            }
-
-            if(running_lights_timer != NULL){
-                printf("deleting timer and creating a new one \n");
-                if(esp_timer_is_active(running_lights_timer) == 1){
-                    ESP_LOGW("POST_HANDLER","STOPPING running lights timer");
-                    ESP_ERROR_CHECK(esp_timer_stop(running_lights_timer));
-                }
-            }
-            
-            
+            Stop_current_animation();
             rgb_params.ramp_up_time = 3000;
             rgb_params.color_ramping = 1;
             rgb_params.repeat = 1;
             RGB_running_lights(&rgb_params);
+        }
 
+        else if(strncmp(brightness_value,"rainbow",7) == 0){
+            rgb_params.ramp_up_time = 3000;
+            Stop_current_animation();
+            RGB_rainbow_lights(&rgb_params);
         }
 
         httpd_resp_sendstr(req, "OK");

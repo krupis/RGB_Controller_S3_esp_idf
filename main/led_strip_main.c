@@ -46,29 +46,7 @@ void app_main(void)
     ESP_ERROR_CHECK(example_start_file_server("/spiffs"));
 
     RGB_setup();
-    //RGB_turn_index_led(0,100,100,50);
-    //xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
 
-
-
-
-    //xTaskCreate(RGB_running_rainbow,"RGB_running_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
-
-    //xTaskCreate(RGB_sine_rainbow,"RGB_sine_rainbow",10000,NULL,5,NULL); // receiving commands from main uart
-
-
-    xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart
-
-    //RGB_set_red(255);
-    //RGB_set_green(100);
-    //RGB_set_blue(50);
-
-
-
-
-    //vTaskDelay(2000/portTICK_PERIOD_MS);
-
-
-
-    
+    xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
+    xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart    
 }

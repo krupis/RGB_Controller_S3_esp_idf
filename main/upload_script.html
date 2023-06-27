@@ -8,49 +8,11 @@
 
 <body>
 
-
-	<p>
-		An example demonstrating the use of the
-		<code>&lt;input type="color"&gt;</code> control.
-	</p>
-
 	<label for="colorWell">Color:</label>
 	<input type="color" value="#ff0000" id="colorWell" />
 
-	<p>
-		Watch the paragraph colors change when you adjust the color picker. As you
-		make changes in the color picker, the first paragraph's color changes, as a
-		preview (this uses the <code>input</code> event). When you close the color
-		picker, the <code>change</code> event fires, and we detect that to change
-		every paragraph to the selected color.
-	</p>
-
-
-
-
-
-
-
-
-
 
 	<table class="styled-table">
-
-		<tr>
-			<form action="/animation" method="POST" name="myForm">
-				<p><label for="first_name">First Name:</label>
-					<input type="text" name="first_name" id="fname">
-				</p>
-
-				<p><label for="last_name">Last Name:</label>
-					<input type="text" name="last_name" id="lname">
-				</p>
-
-				<input value="Submit" type="submit" onclick="submitform()">
-			</form>
-		</tr>
-
-
 
 
 		<tr>
@@ -69,6 +31,16 @@
 			</td>
 			<td>
 				<button id="fade_lights" type="button" style="width:100%" onclick="fading_lights()">Fading lights
+				</button>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="running_lights">Rainbow lights</label>
+			</td>
+			<td>
+				<button id="rainbow_lights" type="button" style="width:100%" onclick="rainbow_lights()">Rainbow lights
 				</button>
 			</td>
 		</tr>
@@ -231,7 +203,6 @@
 		var xhttp = new XMLHttpRequest();
 		xhttp.open("POST", "/animation", true);
 		xhttp.send("name=fading");
-
 	}
 
 
@@ -240,6 +211,13 @@
 		var xhttp = new XMLHttpRequest();
 		xhttp.open("POST", "/animation", true);
 		xhttp.send("name=running");
+	}
+
+	function rainbow_lights() {
+		console.log("rainbow lights button clicked");
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/animation", true);
+		xhttp.send("name=rainbow");
 
 	}
 
