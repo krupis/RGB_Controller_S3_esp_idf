@@ -82,20 +82,8 @@ esp_timer_handle_t rainbow_lights_timer = NULL; // this is main controller task 
 
 #define LED_STRIP_BLINK_GPIO  14
 //#define LED_STRIP_LED_NUMBERS 117
-#define LED_STRIP_LED_NUMBERS 20
+#define LED_STRIP_LED_NUMBERS 10
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
