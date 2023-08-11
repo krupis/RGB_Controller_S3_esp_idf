@@ -82,7 +82,8 @@ esp_timer_handle_t rainbow_lights_timer = NULL; // this is main controller task 
 
 #define LED_STRIP_BLINK_GPIO  14
 //#define LED_STRIP_LED_NUMBERS 117
-#define LED_STRIP_LED_NUMBERS 10
+#define LED_STRIP_LED_NUMBERS 21
+//#define LED_STRIP_LED_NUMBERS 124
 #define LED_STRIP_RMT_RES_HZ  (10 * 1000 * 1000)
 
 
@@ -189,12 +190,15 @@ void RGB_setup(){
 
 
 
-void RGB_fade_in(uint8_t brigthness){
-    ESP_ERROR_CHECK(led_strip_clear(led_strip));
-    for(int i = 0; i <LED_STRIP_LED_NUMBERS;i++){
-        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, brigthness, brigthness, brigthness));
-    }
-    ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+void RGB_change_brightness(uint8_t brigthness){
+    // ESP_ERROR_CHECK(led_strip_clear(led_strip));
+    // for(int i = 0; i <LED_STRIP_LED_NUMBERS;i++){
+    //     ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, brigthness, brigthness, brigthness));
+    // }
+    // ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
+    strip_color.red = brigthness;
+    strip_color.green = brigthness;
+    strip_color.blue = brigthness;
     
 }
 
@@ -234,12 +238,11 @@ void RGB_set_rgb(uint8_t red,uint8_t green,uint8_t blue){
     strip_color.red = red;
     strip_color.green = green;
     strip_color.blue = blue;
-    ESP_ERROR_CHECK(led_strip_clear(led_strip));
-    for(int i = 0; i <LED_STRIP_LED_NUMBERS;i++){
-        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, strip_color.red, strip_color.green, strip_color.blue));
-    }
-    ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-    
+    // ESP_ERROR_CHECK(led_strip_clear(led_strip));
+    // for(int i = 0; i <LED_STRIP_LED_NUMBERS;i++){
+    //     ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, strip_color.red, strip_color.green, strip_color.blue));
+    // }
+    // ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
 }
 
 void RGB_clear_strip(){
@@ -341,24 +344,6 @@ void RGB_running_lights_callback(void* arg)
 
 
 
-
-
-
-
-    // uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
-    // for (;;)
-	// {
-    //     for (int k=0; k<360; k++)
-    //     { 
-    //         for(int i = 0; i < LED_STRIP_LED_NUMBERS;i++){
-    //             sineLED(i,k+(offset*i));
-    //         } 
-    //         ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-    //         vTaskDelay(30/portTICK_PERIOD_MS);
-    //     }
-    // }
-
-
 void RGB_rainbow_lights_callback(void* arg)
 {
     static uint16_t offset = 360/LED_STRIP_LED_NUMBERS;
@@ -373,9 +358,7 @@ void RGB_rainbow_lights_callback(void* arg)
     if(angle == 359){
         angle = 0;
     }
-    ESP_ERROR_CHECK(led_strip_refresh(led_strip)); 
-    
-    
+    ESP_ERROR_CHECK(led_strip_refresh(led_strip));   
 }
 
 
@@ -584,8 +567,68 @@ void Stop_current_animation(){
     else{
         printf("rainbow lights timer is null \n");
     }
-
 }
+
+
+
+
+
+void Get_current_animation_speed(uint16_t speed){
+    if(fading_lights_timer != NULL){
+        if(esp_timer_is_active(fading_lights_timer) == 1){
+            ESP_LOGW("RGB","fading lights is active");
+            uint64_t period;
+            esp_err_t ret = esp_timer_get_period(fading_lights_timer,&period);
+            printf("Period = %llu \n",period);
+            Stop_current_animation();
+            rgb_params.ramp_up_time = speed;
+            rgb_params.color_ramping = 1;
+            rgb_params.repeat = 1;
+            RGB_fade_in_out(&rgb_params);
+        }
+    }
+    else{
+        printf("fading lights timer is null \n");
+    }
+
+
+    if(running_lights_timer != NULL){
+        if(esp_timer_is_active(running_lights_timer) == 1){
+            ESP_LOGW("RGB"," running lights timer is active");
+            uint64_t period;
+            esp_err_t ret = esp_timer_get_period(running_lights_timer,&period);
+            printf("Period = %llu \n",period);
+            Stop_current_animation();
+            rgb_params.ramp_up_time = speed;
+            rgb_params.color_ramping = 1;
+            rgb_params.repeat = 1;
+            RGB_running_lights(&rgb_params);
+
+        }
+    }
+    else{
+        printf("running lights timer is null \n");
+    }
+
+    if(rainbow_lights_timer != NULL){
+        if(esp_timer_is_active(rainbow_lights_timer) == 1){
+            ESP_LOGW("RGB","rainbow lights timer is active");
+            uint64_t period;
+            esp_err_t ret = esp_timer_get_period(rainbow_lights_timer,&period);
+            printf("Period = %llu \n",period);
+            rgb_params.ramp_up_time = speed;
+            Stop_current_animation();
+            RGB_rainbow_lights(&rgb_params);
+
+        }
+    }
+    else{
+        printf("rainbow lights timer is null \n");
+    }
+}
+
+
+
 
 
 void Button_detection_task(void* arg)

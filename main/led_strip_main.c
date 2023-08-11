@@ -47,6 +47,6 @@ void app_main(void)
 
     RGB_setup();
 
-    xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
+    //xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
     xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart    
 }

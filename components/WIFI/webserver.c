@@ -8,7 +8,7 @@
 
 static esp_err_t handle_brightness_change(httpd_req_t *req);
 static esp_err_t handle_animation_change(httpd_req_t *req);
-
+static esp_err_t handle_speed_change(httpd_req_t *req);
 
 /* Max length a file path can have on storage */
 #define FILE_PATH_MAX (ESP_VFS_PATH_MAX + CONFIG_SPIFFS_OBJ_NAME_LEN)
@@ -645,6 +645,15 @@ esp_err_t example_start_file_server(const char *base_path)
     };
     httpd_register_uri_handler(server, &uri_brightness);
 
+
+     httpd_uri_t uri_speed = {
+        .uri      = "/speed",
+        .method   = HTTP_POST,
+        .handler  = handle_speed_change,
+        .user_ctx = server_data
+    };
+    httpd_register_uri_handler(server, &uri_speed);
+
     httpd_uri_t uri_animation = {
         .uri      = "/animation",
         .method   = HTTP_POST,
@@ -728,6 +737,53 @@ esp_err_t example_mount_storage(const char* base_path)
 
 
 
+static esp_err_t handle_speed_change(httpd_req_t *req) {
+
+    char content[100];
+    char speed_value[10];
+    uint16_t speed_value_num;
+    size_t recv_size = MIN(req->content_len, sizeof(content));
+
+    int ret = httpd_req_recv(req, content, recv_size);
+    if (httpd_query_key_value((char *) content, "speed", speed_value, (recv_size-4)) != ESP_ERR_NOT_FOUND) {
+        //ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
+        speed_value_num = strtoul(speed_value, NULL, 10);
+        ESP_LOGI("POST_HANDLER","speed_value= %u \n",speed_value_num);
+        Get_current_animation_speed(speed_value_num);
+        //RGB_change_brightness(brightness_value_num);
+        //get curently active time
+        httpd_resp_sendstr(req, "OK");
+        return ESP_OK;
+    }
+
+
+    if (ret <= 0) {  /* 0 return value indicates connection closed */
+        /* Check if timeout occurred */
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+            /* In case of timeout one can choose to retry calling
+             * httpd_req_recv(), but to keep it simple, here we
+             * respond with an HTTP 408 (Request Timeout) error */
+            httpd_resp_send_408(req);
+        }
+        /* In case of error, returning ESP_FAIL will
+         * ensure that the underlying socket is closed */
+        return ESP_FAIL;
+    }
+
+    
+    /* Send a simple response */
+    httpd_resp_sendstr(req, "OK");
+    return ESP_OK;
+}
+
+
+
+
+
+
+
+
+
 
 static esp_err_t handle_brightness_change(httpd_req_t *req) {
 
@@ -741,7 +797,7 @@ static esp_err_t handle_brightness_change(httpd_req_t *req) {
         //ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
         brightness_value_num = strtoul(brightness_value, NULL, 10);
         //ESP_LOGI("POST_HANDLER","key value number= %u \n",brightness_value_num);
-        RGB_fade_in(brightness_value_num);
+        RGB_change_brightness(brightness_value_num);
         httpd_resp_sendstr(req, "OK");
         return ESP_OK;
     }
@@ -774,7 +830,7 @@ static esp_err_t handle_brightness_change(httpd_req_t *req) {
     }
 
     else if (httpd_query_key_value((char *) content, "rgb", brightness_value, (recv_size-3)) != ESP_ERR_NOT_FOUND) {
-        //ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
+        ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
 
 
         char red_buf[10];
@@ -796,8 +852,6 @@ static esp_err_t handle_brightness_change(httpd_req_t *req) {
         uint8_t blue = strtoul(blue_buf, NULL, 16);
 
         RGB_set_rgb(red,green,blue);
-
-        //RGB_fade_in(brightness_value_num);\watch
         httpd_resp_sendstr(req, "OK");
 
         return ESP_OK;

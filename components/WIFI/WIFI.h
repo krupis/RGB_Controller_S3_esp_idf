@@ -18,7 +18,7 @@
 
 
 #define DEFAULT_SCAN_LIST_SIZE 10
-#define EXAMPLE_ESP_WIFI_SSID_AP      "Smart_led_control"
+#define EXAMPLE_ESP_WIFI_SSID_AP      "Smart_led_control_lukas"
 #define EXAMPLE_ESP_WIFI_PASS_AP     "test12345"
 #define EXAMPLE_ESP_WIFI_CHANNEL   1
 #define EXAMPLE_MAX_STA_CONN       10

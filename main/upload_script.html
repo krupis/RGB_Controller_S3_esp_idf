@@ -9,9 +9,7 @@
 <body>
 
 	<label for="colorWell">Color:</label>
-	<input type="color" value="#ff0000" id="colorWell" />
-
-
+		<input type="color" value="#ff0000" id="colorWell" />
 	<table class="styled-table">
 
 
@@ -100,6 +98,20 @@
 						oninput="test_slider_blue()" />
 					<span class="highlight"></span>
 					<output id="rangevalue_blue">1</output>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label for="speed">Speed</label>
+			</td>
+			<td>
+				<div id="slider">
+					<input class="bar" type="range" id="speed" min="1000" max="5000" value="0"
+						oninput="test_slider_speed()" />
+					<span class="highlight"></span>
+					<output id="speed_output">1</output>
 				</div>
 			</td>
 		</tr>
@@ -275,7 +287,15 @@
 
 	}
 
+	function test_slider_speed() {
+		var slider_value = document.getElementById("speed").value;
+		console.log("slider value = ", slider_value);
+		speed_output.value = slider_value;
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/speed", true);
+		xhttp.send("speed=" + slider_value);
 
+	}
 
 
 

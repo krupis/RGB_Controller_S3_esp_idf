@@ -19,7 +19,7 @@
 #define GPIO_BUTTON_INPUT_SEL  ( (1ULL<<BUTTON_1))
 
 void RGB_setup();
-void RGB_fade_in(uint8_t brigthness);
+void RGB_change_brightness(uint8_t brigthness);
 void RGB_set_red(uint8_t color);
 void RGB_set_green(uint8_t color);
 void RGB_set_blue(uint8_t color);
@@ -63,6 +63,7 @@ void RGB_rainbow_lights(struct rgb_params_s* rgb_parameters);
 void RGB_meet_in_the_middle(void *argument);
 void RGB_fading_up();
 void Stop_current_animation();
+void Get_current_animation_speed(uint16_t speed);
 extern struct rgb_params_s rgb_params;
 extern struct rgb_color_s strip_color;
 

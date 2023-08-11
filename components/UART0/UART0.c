@@ -155,6 +155,26 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
         printf("Started rgb rainbow lights animation \n");
         return 0;
     }
+    if (!strncmp("speed:", line,6))
+    {	
+        char temp_buf[5];
+		uint16_t data_to_write=0;
+		for(int i = 0;i <=(strlen(line)-6);i++){
+			temp_buf[i] = line[6+i];
+		}
+		data_to_write = atoi(temp_buf);
+        Stop_current_animation();
+        rgb_params.ramp_up_time = data_to_write; //takes 3 seconds to reach target and another 3 seconds to fade down
+        RGB_rainbow_lights(&rgb_params);
+
+    if(esp_timer_is_active(rainbow_lights_timer) == 0){
+        ESP_ERROR_CHECK(esp_timer_start_periodic(rainbow_lights_timer, rgb_parameters->ramp_up_time*10)); //
+        printf("rainbow lights timer started \n");
+    }
+
+        printf("Started rgb rainbow lights animation \n");
+        return 0;
+    }
 
     if (!strncmp("delete_rainbow_task", line,19))
     {	
