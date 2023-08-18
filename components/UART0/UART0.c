@@ -1,10 +1,11 @@
 #include "UART0.h"
 
-// hello
 static const char* TAG = "UART0";
-static const char* TEST_TAG = "TEST";
 
 
+
+extern esp_timer_handle_t rainbow_lights_timer;
+extern struct rgb_color_s strip_color; // global color struct
 
 
 
@@ -31,11 +32,9 @@ void UART0_setup() {
 
 
 
-void UART0_task(void *argument)
+__attribute__((noreturn))void UART0_task(void *argument)
 {
 	UART0_setup();
-  	unsigned int char_received=EOF;
-  	unsigned int char_counter=0;
   	char command_line[UART0_COMMAND_LINE_MAX_SIZE];
   	for (;;)
 	{	
@@ -58,10 +57,7 @@ void UART0_task(void *argument)
 
 
 
-// this semaphore will ensure that the SPI (external eeprom) cannot be interrupted via another task
-
-//esp_log_level_set("*",ESP_LOG_WARN);
-bool ParseSystemCmd(char *line, uint16_t cmd_size)
+bool ParseSystemCmd(char *line, int cmd_size)
 {
 
     if (!strncmp("ping", line,4))
@@ -78,11 +74,11 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
 			return 0;
 		}
 		char temp_buf[4];
-		uint16_t data_to_write=0;
+		uint8_t data_to_write=0;
 		for(int i = 0;i <=(strlen(line)-4);i++){
 			temp_buf[i] = line[4+i];
 		}
-		data_to_write = atoi(temp_buf);
+		data_to_write = (uint8_t)atoi(temp_buf);
         RGB_set_red(data_to_write);
         return true;
     }
@@ -95,11 +91,11 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
 			return 0;
 		}
 		char temp_buf[4];
-		uint16_t data_to_write=0;
+		uint8_t data_to_write=0;
 		for(int i = 0;i <=(strlen(line)-6);i++){
 			temp_buf[i] = line[6+i];
 		}
-		data_to_write = atoi(temp_buf);
+		data_to_write = (uint8_t)atoi(temp_buf);
         RGB_set_green(data_to_write);
         return true;
     }
@@ -112,11 +108,11 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
 			return 0;
 		}
 		char temp_buf[4];
-		uint16_t data_to_write=0;
+		uint8_t data_to_write=0;
 		for(int i = 0;i <=(strlen(line)-5);i++){
 			temp_buf[i] = line[5+i];
 		}
-		data_to_write = atoi(temp_buf);
+		data_to_write = (uint8_t)atoi(temp_buf);
         RGB_set_blue(data_to_write);
         return true;
     }
@@ -128,6 +124,7 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
         strip_color.red = 100;
         strip_color.blue = 100;
         strip_color.green = 0;
+        strip_color.brightness = 1.0f;
         rgb_params.color_ramping = 1;
         RGB_running_lights(&rgb_params);
         printf("Started rgb running lights animation \n");
@@ -136,12 +133,12 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
 
     if (!strncmp("fading", line,6))
     {	
-        
         Stop_current_animation();
-        rgb_params.ramp_up_time = 10000; //takes 3 seconds to reach target and another 3 seconds to fade down
+        rgb_params.ramp_up_time = 3000; //takes 3 seconds to reach target and another 3 seconds to fade down
         strip_color.red = 56;
         strip_color.blue = 100;
         strip_color.green = 25;
+        strip_color.brightness = 1.0f;
         RGB_fade_in_out(&rgb_params);
         printf("Started rgb fading lights animation \n");
         return 0;
@@ -155,6 +152,7 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
         printf("Started rgb rainbow lights animation \n");
         return 0;
     }
+    // adjust speed of currently running animation. Keep in mind that the animation must be already running
     if (!strncmp("speed:", line,6))
     {	
         char temp_buf[5];
@@ -162,23 +160,47 @@ bool ParseSystemCmd(char *line, uint16_t cmd_size)
 		for(int i = 0;i <=(strlen(line)-6);i++){
 			temp_buf[i] = line[6+i];
 		}
-		data_to_write = atoi(temp_buf);
-        Stop_current_animation();
+		data_to_write = (uint16_t)atoi(temp_buf);
         rgb_params.ramp_up_time = data_to_write; //takes 3 seconds to reach target and another 3 seconds to fade down
-        RGB_rainbow_lights(&rgb_params);
-
-    if(esp_timer_is_active(rainbow_lights_timer) == 0){
-        ESP_ERROR_CHECK(esp_timer_start_periodic(rainbow_lights_timer, rgb_parameters->ramp_up_time*10)); //
-        printf("rainbow lights timer started \n");
+        enum animation_index_e active_animation = Stop_current_animation();
+        
+        if(active_animation != 255){
+            if(active_animation == FADING){
+                Start_animation_by_index(FADING);
+            }
+            else if(active_animation == RUNNING){
+                Start_animation_by_index(RUNNING);
+            }
+            else if(active_animation == RAINBOW){
+                Start_animation_by_index(RAINBOW);
+            }
+        }
+        else{
+            printf("Animation is not running currently \n");
+        }
+        return 0;
     }
 
-        printf("Started rgb rainbow lights animation \n");
-        return 0;
+    // parse float number
+    if (!strncmp("brightness:", line,11))
+    {	
+        if (!isdigit((unsigned char)line[11]))
+		{
+			ESP_LOGW(TAG,"Entered input is not a number");
+			return 0;
+		}
+		char temp_buf[4];
+		double temp_to_calib=0;
+		for(int i = 0;i <=(strlen(line)-11);i++){
+			temp_buf[i] = line[11+i];
+		}
+		temp_to_calib = strtof(temp_buf,NULL);
+        printf("Setting brightness to = %.2f \n",temp_to_calib);
+        strip_color.brightness = (float)(temp_to_calib);
     }
 
     if (!strncmp("delete_rainbow_task", line,19))
     {	
-        //Delete_RGB_rainbow_task();
         return 0;
     }
     if (!strncmp("clear_strip", line,11))

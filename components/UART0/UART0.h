@@ -13,7 +13,7 @@
 
 
 
-bool ParseSystemCmd(char *line, uint16_t cmd_size);
+bool ParseSystemCmd(char *line, int cmd_size);
 
 
 
