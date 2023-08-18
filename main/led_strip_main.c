@@ -20,6 +20,7 @@
 #include "WIFI.h"
 #include "webserver.h"
 #include "RGB.h"
+#include "strip_animations.h"
 #include "UART0.h"
 
 
@@ -37,8 +38,6 @@ void app_main(void)
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
-    //ESP_ERROR_CHECK(esp_event_loop_create_default());
-    printf("hello \n");
 
 
     wifi_init_softap();
@@ -46,6 +45,7 @@ void app_main(void)
     ESP_ERROR_CHECK(example_start_file_server("/spiffs"));
 
     RGB_setup();
+    Initialize_animation_timers();
 
     //xTaskCreate(RGB_meet_in_the_middle,"RGB_meet_in_the_middle",10000,NULL,5,NULL); // receiving commands from main uart
     xTaskCreate(UART0_task,"UART0_task",10000,NULL,5,NULL); // receiving commands from main uart    

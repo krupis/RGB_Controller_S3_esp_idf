@@ -9,7 +9,7 @@
 #include "esp_sntp.h"
 #include <time.h>
 #include <sys/time.h>
-#include "RGB.h"
+#include "strip_animations.h"
 
 
 
