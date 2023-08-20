@@ -28,6 +28,9 @@ void RGB_set_red(uint8_t color);
 void RGB_set_green(uint8_t color);
 void RGB_set_blue(uint8_t color);
 void RGB_set_rgb(uint8_t red, uint8_t green, uint8_t blue);
+void RGB_set_rgb_and_refresh(uint8_t red, uint8_t green, uint8_t blue);
+
+
 void RGB_turn_index_led(uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
 void RGB_clear_strip();
 

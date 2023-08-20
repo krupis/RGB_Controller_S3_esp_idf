@@ -236,7 +236,8 @@
 
 	function updateFirst(event) {
 		console.log("update first");
-		const p = document.querySelector("p");
+		var p = document.getElementById("colorWell");
+
 		if (p) {
 			console.log(colorWell.value);
 			var xhttp = new XMLHttpRequest();

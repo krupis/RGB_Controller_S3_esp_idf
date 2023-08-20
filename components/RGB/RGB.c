@@ -148,6 +148,21 @@ void RGB_set_rgb(uint8_t red, uint8_t green, uint8_t blue)
     strip_color.blue = blue;
 }
 
+void RGB_set_rgb_and_refresh(uint8_t red, uint8_t green, uint8_t blue)
+{
+    strip_color.red = red;
+    strip_color.green = green;
+    strip_color.blue = blue;
+    for(int i = 0; i < LED_STRIP_LED_NUMBERS; i++ ){
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, red, green, blue));
+    }
+    ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+}
+
+
+
+
+
 void RGB_clear_strip()
 {
     ESP_ERROR_CHECK(led_strip_clear(led_strip));

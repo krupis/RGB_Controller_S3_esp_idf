@@ -777,11 +777,12 @@ static esp_err_t handle_brightness_change(httpd_req_t *req)
     size_t recv_size = MIN(req->content_len, sizeof(content));
 
     int ret = httpd_req_recv(req, content, recv_size);
+    printf("Content received = %s \n",content);
     if (httpd_query_key_value((char *)content, "name", brightness_value, (recv_size - 4)) != ESP_ERR_NOT_FOUND)
     {
-        // ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
+        ESP_LOGI("POST_HANDLER","key value = %s \n",brightness_value);
         brightness_value_num = strtoul(brightness_value, NULL, 10);
-        // ESP_LOGI("POST_HANDLER","key value number= %u \n",brightness_value_num);
+        ESP_LOGI("POST_HANDLER","key value number= %u \n",brightness_value_num);
         RGB_change_brightness(brightness_value_num);
         httpd_resp_sendstr(req, "OK");
         return ESP_OK;
@@ -838,7 +839,8 @@ static esp_err_t handle_brightness_change(httpd_req_t *req)
         uint8_t green = strtoul(green_buf, NULL, 16);
         uint8_t blue = strtoul(blue_buf, NULL, 16);
 
-        RGB_set_rgb(red, green, blue);
+        RGB_set_rgb_and_refresh(red, green, blue);
+        
         httpd_resp_sendstr(req, "OK");
 
         return ESP_OK;
