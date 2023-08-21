@@ -59,15 +59,12 @@ speedSlider.addEventListener('input', updateAnimationSpeed);
 
 
 function user_mode_popup_configure(sel) {
-  let user_mode_popup = document.getElementById(sel);
-  user_mode_popup.innerHTML = ``;
-  user_mode_popup.style.display = "none";
+  hide_div("test_div");
+
 }
 
 function user_mode_popup_cancel(sel) {
-  let user_mode_popup = document.getElementById(sel);
-  user_mode_popup.innerHTML = ``;
-  user_mode_popup.style.display = "none";
+  hide_div("test_div");
 }
 
 

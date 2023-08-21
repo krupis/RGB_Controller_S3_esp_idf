@@ -19,103 +19,86 @@
             </tr>
         </table>
 
-        <div class="backdrop" id="popup_configuration"></div>
+     
 
         <div id="test_div">
-            <div class="popdiv">
-                <table class="popup-table">
-                    <th colspan="2">Running lights configuration:</th>
 
-                    <colgroup>
-                        <col style="width: 20%" />
-                        <col style="width: 80%" />
-                    </colgroup>
-                    <tr>
-                        <td>Visualization:</td>
-                        <td>
-                            <div class="running_lights">
-                                <ul class="running_lights_container">
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
 
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
+                
+    <div class="popup-container">
+        <div class="popup-content">
+          <div class="popup-header">Running lights configuration:</div>
+  
+          <div class="running_lights">
+            <ul class="running_lights_container">
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+              <li class="circle-container">
+                <div class="circle-container-smaller">
+                  <div class="circle"></div>
+                </div>
+              </li>
+  
+            </ul>
+          </div>
+  
+          <div class="input-group">
+            <label for="color">Color:</label>
+            <input type="color" id="color" value="#ffff00" />
+          </div>
+  
+          <div class="input-group">
+            <label for="speed">Speed:</label>
+            <input type="range" id="speed" min="1" max="5" value="3" />
+          </div>
+  
+          <div class="button-row">
+            <button onclick="user_mode_popup_cancel('popup_configuration')">Cancel</button>
+            <button onclick="user_mode_popup_configure('popup_configuration')">OK</button>
+          </div>
+        </div>
+      </div>
 
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                    <li class="circle-container">
-                                        <div class="circle-container-smaller">
-                                            <div class="circle"></div>
-                                        </div>
-                                    </li>
-
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Color:</td>
-                        <td>
-                            <input type="color" id="color" value="#ffff00" />
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Color:</td>
-                        <td>
-                            <input type="range" id="speed" min="1" max="5" value="3" />
-                        </td>
-                    </tr>
-
-                    <colgroup>
-                        <col style="width: 50%" />
-                        <col style="width: 50%" />
-                    </colgroup>
-                    <tr>
-                        <td style="text-align: center">
-                            <button onclick="user_mode_popup_cancel('popup_configuration')">Cancel</button>
-                          </td>
-                          <td style="text-align: center">
-                            <button onclick="user_mode_popup_configure('popup_configuration')">OK</button>
-                          </td>
-                    </tr>
-                </table>
-            </div>
         </div>
 
         <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet" />
