@@ -18,12 +18,11 @@ body {
 
 .running_lights_container {
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-wrap: wrap; /
+  flex-wrap: wrap; 
   flex-direction: row;
-  padding: 0;
-  margin: 0;
+  padding: 0px;
+  margin: 0px;
 } 
 
 
@@ -48,7 +47,7 @@ body {
 
 .popup-content {
   background-color: #ffffff;
-  width: 300px;
+  width: 440px;
   text-align: center;
   border-radius: 10px;
   padding: 20px;
@@ -66,13 +65,18 @@ body {
 }
 
 .input-group label {
-  flex: 1;
+  flex: 0 0 20%; /* Set flex-grow, flex-shrink, and flex-basis */
   text-align: left;
 }
 
 .input-group input {
-  flex: 2;
+  flex: 0 0 80%; /* Set flex-grow, flex-shrink, and flex-basis */
 }
+
+.input-group .running_lights {
+  flex: 0 0 80%; /* Set flex-grow, flex-shrink, and flex-basis */
+}
+
 
 .button-row {
   display: flex;
@@ -107,17 +111,17 @@ body {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
   /* Adjust background color and opacity */
-  width: 15px;
+  width: 12px;
   /* Match circle width */
-  height: 15px;
+  height: 12px;
   /* Match circle height */
   margin: 5px;
   /* Adjust this margin to control spacing between circles */
 }
 
 .circle {
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
   background: #ffff00;
   border-radius: 50%;
   animation: grow 3s ease-in-out infinite;
@@ -205,8 +209,8 @@ body {
 .popup-table {
   
   background-color:white;
-  width: 380px;
-  height:380px;
+  width: 440px;
+  height:440px;
   font-size: 14px;
   margin: 0 auto; /* Center the table horizontally */
   border-radius:10px;
