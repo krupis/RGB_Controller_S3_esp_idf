@@ -3,6 +3,7 @@
         <link rel="stylesheet" href="styles.css" />
         <link rel="stylesheet" href="fading_in_out.css" />
         <link rel="stylesheet" href="fading_in.css" />
+        <link rel="stylesheet" href="rainbow.css" />
         <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
@@ -11,11 +12,17 @@
 
 
 
+        <p>title</p>
+
+
+
+
         <!-- List of animations-->
         <select id="led_animations" onchange = "Handle_animation_change(this.value);"> 
             <option value = "0">None</option>
             <option value = "1">Fade in</option>
             <option value = "2">Fade in-out</option>
+            <option value = "3">Rainbow</option>
         </select>
 
         <div id="fading_in_out" style="display:none">
@@ -28,55 +35,54 @@
                         <label for="Visualization">Visual:</label>
                         <div class="running_lights">
                             <ul class="running_lights_container">
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
+                                        <div class="circle_fade_in_out"></div>
+                                    </div>
+                                </li>
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
 
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
-
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
-                                        <div class="circle_fade_in_out"></div>
-                                    </div>
-                                </li>
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
+                                <li class="running-container">
+                                    <div class="running-container-smaller">
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
@@ -185,6 +191,87 @@
                     <div class="input-group">
                         <label for="speed_fade_in">Speed:</label>
                         <input type="range" id="speed_fade_in" min="1" max="5" value="3" />
+                    </div>
+
+                    <div class="button-row">
+                        <button onclick="user_mode_popup_cancel('popup_configuration')">Cancel</button>
+                        <button onclick="user_mode_popup_configure('popup_configuration')">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+        <div id="rainbow" style="display:none">
+            
+            <div class="popup-container">
+                <div class="popup-content">
+                    <div class="popup-header">Rainbow lights configuration:</div>
+
+                    <div class="input-group">
+                        <label for="Visualization">Visual:</label>
+                        <div class="rainbow_lights">
+                            <ul class="rainbow_lights_container">
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+
+                                <li class="circle-container">
+                                    <div class="circle-container-smaller">
+                                        <div class="circle_rainbow"></div>
+                                    </div>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="color_fade_in_out">Color:</label>
+                        <input type="color" id="color_fade_in_out" value="#ffff00" />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="speed_fade_in_out">Speed:</label>
+                        <input type="range" id="speed_fade_in_out" min="1" max="5" value="3" />
                     </div>
 
                     <div class="button-row">

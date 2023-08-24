@@ -9,24 +9,17 @@ const speedSlider = document.getElementById('speed_fade_in_out');
 const lights = document.querySelectorAll('.running_lights ul li');
 const fading_in_out_circle = document.querySelectorAll('.circle_fade_in_out'); // fading in out
 
-const circleContainers = document.querySelectorAll('.circle-container');
 
-//CHANGE COLOR
-      circleContainers.forEach(container => {
-      changeBoxShadowColorInAnimation(container, '#ffff00');
-  });
-  
 
   colorInput.addEventListener('input', () => {
     const newColor = colorInput.value;
     for (let i = 0; i < lights.length; i++) {
       if(active_animation == 2){
         fading_in_out_circle[i].style.backgroundColor = `${newColor}`;
+        fading_in_out_circle[i].style.boxShadow = `0 0 50px 10px ${newColor}`;
+
       }
     }
-    circleContainers.forEach(container => {
-      changeBoxShadowColorInAnimation(container, newColor);
-    });
   });
 
 
@@ -35,7 +28,7 @@ function updateAnimationSpeed() {
   console.log("adjusting speed ");
   const animationSpeed = 6 - speedSlider.value; // Inverse mapping from slider value to animation speed
   fading_in_out_circle.forEach(fading_in_out_circle => {
-    fading_in_out_circle.style.animation = `grow ${animationSpeed}s ease-in-out infinite`;
+    fading_in_out_circle.style.animation = `fading ${animationSpeed}s ease-in-out infinite`;
   });
 }
 
@@ -144,11 +137,38 @@ function Handle_animation_change(value){
   console.log("value = ",value);
   if(value == 1){
     hide_div("fading_in_out");
+    hide_div("rainbow");
     unhide_div("fading_in");
   }
   else if(value == 2){
     hide_div("fading_in");
+    hide_div("rainbow");
     unhide_div("fading_in_out");
+  }
+  else if(value == 3){
+    hide_div("fading_in");
+    hide_div("fading_in_out");
+    unhide_div("rainbow");
   }
   active_animation = value;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
