@@ -16,8 +16,7 @@ const fading_in_out_circle = document.querySelectorAll('.circle_fade_in_out'); /
     for (let i = 0; i < lights.length; i++) {
       if(active_animation == 2){
         fading_in_out_circle[i].style.backgroundColor = `${newColor}`;
-        fading_in_out_circle[i].style.boxShadow = `0 0 50px 10px ${newColor}`;
-
+        fading_in_out_circle[i].style.boxShadow = `0 0 50px 5px ${newColor}`;
       }
     }
   });
@@ -63,11 +62,10 @@ speedSlider.addEventListener('input', updateAnimationSpeed);
       console.log("chaning fading in color");
       if(active_animation == 1){
         fading_in_circle[i].style.backgroundColor = `${newColor}`;
+        fading_in_circle[i].style.boxShadow = `0 0 50px 5px ${newColor}`;
       }
     }
-    circleContainers.forEach(container => {
-      changeBoxShadowColorInAnimation(container, newColor);
-    });
+
     fading_in_circle.forEach(fading_in_circle => {
       fading_in_circle.classList.remove('circle_fade_in'); // Remove animation class
       void fading_in_circle.offsetWidth;
@@ -90,25 +88,44 @@ speedSlider.addEventListener('input', updateAnimationSpeed);
     });
   }
   
+
+
+
+
+
+
+
+
+
+  const speedInput_rainbow = document.getElementById('speed_rainbow');
+  const rainbow_lights = document.querySelectorAll('.rainbow_lights ul li');
+  const rainbow_circle = document.querySelectorAll('.circle_rainbow'); // fading in 
+
+
+  
+
+  function updateAnimationSpeed3() {
+  console.log("speedInput_rainbow.value = ",speedInput_rainbow.value);
+    rainbow_circle.forEach((rainbow_circle,index) => {
+
+      const animationSpeed = 11 - speedInput_rainbow.value; // Inverse mapping from slider value to animation speed
+      const newDelay = -index * ((11-speedInput_rainbow.value)/20);
+      console.log("newdelay = ",newDelay);
+      rainbow_circle.style.animationDuration = animationSpeed.toString() + "s";
+      rainbow_circle.style.animationDelay = newDelay + "s";
+    });
+  }
+
+
+
+
+
+
+
+
   speedSlider.addEventListener('input', updateAnimationSpeed);
   speedInput_fade_in.addEventListener('input', updateAnimationSpeed2);
-
-
-
-
-
-// Function to change box shadow color within the animation
-function changeBoxShadowColorInAnimation(element, color) {
-  element.style.setProperty('--box-shadow-color', color);
-}
-
-
-
-
-
-
-
-
+  speedInput_rainbow.addEventListener('input', updateAnimationSpeed3);
 
 function user_mode_popup_configure(sel) {
   hide_div("test_div");

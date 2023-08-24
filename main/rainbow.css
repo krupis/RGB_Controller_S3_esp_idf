@@ -1,170 +1,162 @@
-
-
 .rainbow_lights {
-    position: relative;
-    transform: scale(1);
-    /* Adjust the scale factor as needed */
-  }
-
-  
-  .rainbow_lights_container {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap; 
-    flex-direction: row;
-    padding: 0px;
-    margin: 0px;
-  } 
-  
-  
-  .popup-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .popup-content {
-    background-color: #ffffff;
-    width: 440px;
-    text-align: center;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  
-  .input-group {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .input-group label {
-    flex: 0 0 15%; /* Set flex-grow, flex-shrink, and flex-basis */
-    text-align: left;
-  }
-  
-  .input-group input {
-    flex: 0 0 50%; /* Set flex-grow, flex-shrink, and flex-basis */
-  }
-  
-  .input-group .running_lights {
-    flex: 0 0 85%; /* Set flex-grow, flex-shrink, and flex-basis */
-  }
-  
-  
-  .button-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  .button-row button {
-    flex: 1;
-  }
-  
-  
-  
-  
-  .circle-container {
-  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid black;
-    border-radius: 20%;
-    padding: 1px;
-    margin: 2px;
-    background-color: #808080;
-    /* Adjust this margin to control spacing between circles */
-    position: relative;
-  }
-  
-  .circle-container-smaller {
-  
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    /* Adjust background color and opacity */
-    width: 12px;
-    /* Match circle width */
-    height: 12px;
-    /* Match circle height */
-    margin: 5px;
-    /* Adjust this margin to control spacing between circles */
-  }
-  
-  .circle_rainbow {
-    width: 12px;
-    height: 12px;
-    background: red;
-    border-radius: 50%;
-    animation: growing 5s ease-in-out infinite;
-  }
-  
-  
-  @keyframes growing {
-    0%{
-      background: #ffff00; /* Start and end color */
-      box-shadow:0 0 30px #ffff00;
-    }
-    15% {
-      background: #76ff03; /* Mid-animation color */
-      box-shadow:0 0 30px #76ff03;
-    }
-    30% {
-      background: #f06292; /* Mid-animation color */
-      box-shadow:0 0 30px #f06292;
-    }
-    45% {
-      background: #4fc3f7; /* Mid-animation color */
-      box-shadow:0 0 30px #4fc3f7;
-    }
-    60% {
-      background: #ba68c8; /* Mid-animation color */
-      box-shadow:0 0 30px #ba68c8;
-    }
-    75% {
-      background: #f57c00; /* Mid-animation color */
-      box-shadow:0 0 30px #f57c00;
-    }
-    100% {
-      background: #673ab7; /* Mid-animation color */
-      box-shadow:0 0 30px #673ab7;
-  }
+  position: relative;
+  transform: scale(1);
+  /* Adjust the scale factor as needed */
 }
-  
-.rainbow_lights ul li:nth-child(1) {
-  box-shadow: 0 0 50px var(--box-shadow-color);
+
+.rainbow_lights_container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  padding: 0px;
+  margin: 0px;
+}
+
+.popup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.popup-content {
+  background-color: #ffffff;
+  width: 440px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.input-group label {
+  flex: 0 0 15%; /* Set flex-grow, flex-shrink, and flex-basis */
+  text-align: left;
+}
+
+.input-group input {
+  flex: 0 0 50%; /* Set flex-grow, flex-shrink, and flex-basis */
+}
+
+.input-group .running_lights {
+  flex: 0 0 85%; /* Set flex-grow, flex-shrink, and flex-basis */
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.button-row button {
+  flex: 1;
+}
+
+.circle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid black;
+  border-radius: 20%;
+  padding: 1px;
+  margin: 2px;
+  background-color: #808080;
+  /* Adjust this margin to control spacing between circles */
+  position: relative;
+}
+
+.circle-container-smaller {
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  /* Adjust background color and opacity */
+  width: 12px;
+  /* Match circle width */
+  height: 12px;
+  /* Match circle height */
+  margin: 5px;
+  /* Adjust this margin to control spacing between circles */
+}
+
+.circle_rainbow {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: growing 5.625s ease-in infinite;
+}
+
+@keyframes growing {
+  0% {
+    background: #cc0001; /* Start and end color */
+    box-shadow: 0 0 30px 5px #cc0001;
+  }
+  13% {
+    background: #fb940b; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #fb940b;
+  }
+  26% {
+    background: #ffff01; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #ffff01;
+  }
+  39% {
+    background: #01cc00; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #01cc00;
+  }
+  52% {
+    background: #03c0c6; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #03c0c6;
+  }
+  65% {
+    background: #0000fe; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #0000fe;
+  }
+  78% {
+    background: #762ca7; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #762ca7;
+  }
+  90% {
+    background: #fe98bf; /* Mid-animation color */
+    box-shadow: 0 0 30px 5px #fe98bf;
+  }
+  100% {
+    background: #cc0001; /* Start and end color */
+    box-shadow: 0 0 30px 5px #cc0001;
+  }
 }
 
 .rainbow_lights .circle-container:nth-child(1) .circle_rainbow {
-    animation-delay:-1.4s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(2) .circle_rainbow {
-    animation-delay:-1.2s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(3) .circle_rainbow {
-    animation-delay:-1s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(4) .circle_rainbow {
-    animation-delay:-0.8s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(5) .circle_rainbow {
-    animation-delay:-0.6s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(6) .circle_rainbow {
-    animation-delay:-0.4s;
-  }
-  
-  .rainbow_lights .circle-container:nth-child(7) .circle_rainbow {
-    animation-delay:-0.2s;
-  }
-  
+  animation-delay: -5s;
+}
 
-  
+.rainbow_lights .circle-container:nth-child(2) .circle_rainbow {
+  animation-delay: -4.375s;
+}
+
+.rainbow_lights .circle-container:nth-child(3) .circle_rainbow {
+  animation-delay: -3.75s;
+}
+
+.rainbow_lights .circle-container:nth-child(4) .circle_rainbow {
+  animation-delay: -3.125s;
+}
+
+.rainbow_lights .circle-container:nth-child(5) .circle_rainbow {
+  animation-delay: -2.56s;
+}
+
+.rainbow_lights .circle-container:nth-child(6) .circle_rainbow {
+  animation-delay: -1.875s;
+}
+
+.rainbow_lights .circle-container:nth-child(7) .circle_rainbow {
+  animation-delay: -1.25s;
+}
+
+.rainbow_lights .circle-container:nth-child(8) .circle_rainbow {
+  animation-delay: -0.625s;
+}
