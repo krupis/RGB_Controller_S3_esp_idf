@@ -66,7 +66,7 @@ bool ParseSystemCmd(char *line, int cmd_size)
         }
         data_to_write = (uint8_t)atoi(temp_buf);
         strip_color.red = data_to_write;
-        RGB_set_rgb_and_refresh(strip_color.red,strip_color.green,strip_color.blue);
+        RGB_set_rgb_and_refresh(strip_color.red, strip_color.green, strip_color.blue);
         return true;
     }
 
@@ -85,7 +85,7 @@ bool ParseSystemCmd(char *line, int cmd_size)
         }
         data_to_write = (uint8_t)atoi(temp_buf);
         strip_color.green = data_to_write;
-        RGB_set_rgb_and_refresh(strip_color.red,strip_color.green,strip_color.blue);
+        RGB_set_rgb_and_refresh(strip_color.red, strip_color.green, strip_color.blue);
         return true;
     }
 
@@ -105,7 +105,7 @@ bool ParseSystemCmd(char *line, int cmd_size)
 
         data_to_write = (uint8_t)atoi(temp_buf);
         strip_color.blue = data_to_write;
-        RGB_set_rgb_and_refresh(strip_color.red,strip_color.green,strip_color.blue);
+        RGB_set_rgb_and_refresh(strip_color.red, strip_color.green, strip_color.blue);
         return true;
     }
 
