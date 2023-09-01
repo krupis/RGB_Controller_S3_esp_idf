@@ -98,6 +98,7 @@
     height: 12px;
     background: #ffff00;
     border-radius: 50%;
+    box-shadow: 0 0 50px 10px #ffff00;
      /* animation: grow 3s ease-out 1;  */
     animation-name:example;
     animation-duration:4s;
@@ -113,7 +114,7 @@
     to {
         transform:scale(1);
         opacity:1;
-        box-shadow: 0 0 50px var(--box-shadow-color);
+
     }
     
   }
