@@ -1,6 +1,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="rgb_common.css" />
         <link rel="stylesheet" href="fading_in_out.css" />
         <link rel="stylesheet" href="fading_in.css" />
         <link rel="stylesheet" href="rainbow.css" />
@@ -9,24 +10,17 @@
     </head>
 
     <body>
-
-
-
         <p>title</p>
 
-
-
-
         <!-- List of animations-->
-        <select id="led_animations" onchange = "Handle_animation_change(this.value);"> 
-            <option value = "0">None</option>
-            <option value = "1">Fade in</option>
-            <option value = "2">Fade in-out</option>
-            <option value = "3">Rainbow</option>
+        <select id="led_animations" onchange="Handle_animation_change(this.value);">
+            <option value="0">None</option>
+            <option value="1">Fade in</option>
+            <option value="2">Fade in-out</option>
+            <option value="3">Rainbow</option>
         </select>
 
-        <div id="fading_in_out" style="display:none">
-            
+        <div id="fading_in_out" style="display: none">
             <div class="popup-container">
                 <div class="popup-content">
                     <div class="popup-header">Running lights configuration:</div>
@@ -35,7 +29,6 @@
                         <label for="Visualization">Visual:</label>
                         <div class="running_lights">
                             <ul class="running_lights_container">
-
                                 <li class="circle-container">
                                     <div class="circle-container-smaller">
                                         <div class="circle_fade_in_out"></div>
@@ -83,13 +76,6 @@
                                         <div class="circle_fade_in_out"></div>
                                     </div>
                                 </li>
-
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
-                                        <div class="circle_fade_in_out"></div>
-                                    </div>
-                                </li>
-                                
                             </ul>
                         </div>
                     </div>
@@ -112,15 +98,7 @@
             </div>
         </div>
 
-
-
-
-
-
-
-
-        <div id="fading_in" style="display:none">
-            
+        <div id="fading_in" style="display: none">
             <div class="popup-container">
                 <div class="popup-content">
                     <div class="popup-header">Fading in lights configuration:</div>
@@ -176,12 +154,6 @@
                                         <div class="circle_fade_in"></div>
                                     </div>
                                 </li>
-                                <li class="circle-container">
-                                    <div class="circle-container-smaller">
-                                        <div class="circle_fade_in"></div>
-                                    </div>
-                                </li>
-                                
                             </ul>
                         </div>
                     </div>
@@ -204,15 +176,7 @@
             </div>
         </div>
 
-
-
-
-
-
-
-
-        <div id="rainbow" style="display:none">
-            
+        <div id="rainbow" style="display: none">
             <div class="popup-container">
                 <div class="popup-content">
                     <div class="popup-header">Rainbow lights configuration:</div>
@@ -268,11 +232,9 @@
                                         <div class="circle_rainbow"></div>
                                     </div>
                                 </li>
-                                
                             </ul>
                         </div>
                     </div>
-
 
                     <div class="input-group">
                         <label for="speed_rainbow">Speed:</label>
@@ -286,9 +248,6 @@
                 </div>
             </div>
         </div>
-
-
-
 
         <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet" />
         <script src="scripts.js" async></script>
