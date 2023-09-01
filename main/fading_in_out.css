@@ -67,7 +67,7 @@
   
   
   
-  .running-container {
+  .circle-container {
   
     display: flex;
     align-items: center;
@@ -81,7 +81,7 @@
     position: relative;
   }
   
-  .running-container-smaller {
+  .circle-container-smaller {
   
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.5);
@@ -99,7 +99,7 @@
     width: 12px;
     height: 12px;
     background: #ffff00;
-    box-shadow: 0 0 50px 10px #ffff00;
+    box-shadow: 0 0 50px 5px #ffff00;
     border-radius: 50%;
     animation: fading 3s ease-in-out infinite;
   }

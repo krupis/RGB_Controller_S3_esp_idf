@@ -97,6 +97,7 @@
     width: 12px;
     height: 12px;
     background: #ffff00;
+    box-shadow: 0 0 50px 5px #ffff00;
     border-radius: 50%;
     box-shadow: 0 0 50px 10px #ffff00;
      /* animation: grow 3s ease-out 1;  */
@@ -106,6 +107,7 @@
   }
   
   
+
   @keyframes example {
     from {
         transform:scale(0);
